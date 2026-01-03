@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>KODEX ETF 요약</title>
+
+  <style>
+    /* 항상 스크롤바 공간 확보 (레이아웃 고정) */
+    html {
+      overflow-y: scroll;
+    }
+
+    /* 모달 열릴 때 배경 스크롤 차단 */
+    html.modal-open,
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    /* 실제 스크롤 주체(wrapper) 차단 */
+    body.modal-open #page-content-wrapper {
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+<div layout:fragment="content" class="container mt-4">
+
+  <!-- 제목 -->
+  <h3 class="fw-bold mb-3">KODEX ETF 요약 목록</h3>
+
+  <!-- 🔍 검색 영역 -->
+  <form method="get" action="/kodex/summary" class="mb-3">
+    <div class="input-group">
+      <input type="text"
+             name="q"
+             class="form-control"
+             placeholder="ETF명 / 종목명 / 종목코드 검색 (예: KODEX 200, 삼성전자, 005930)"
+             th:value="${q}">
+      <button class="btn btn-primary">검색</button>
+    </div>
+  </form>
+
+  <!-- 전체 개수 -->
+  <div class="mb-3 text-muted small">
+    전체 ETF 수:
+    <strong th:text="${list != null ? #lists.size(list) : 0}"></strong>개
+  </div>
+
+  <!-- 요약 테이블 -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover table-striped mb-0 text-center align-middle">
+        <thead class="table-light">
+        <tr>
+          <th>ETF 명</th>
+          <th>IRP 여부</th>
+          <th>구성 종목 수</th>
+          <th>구성 종목 보기</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${list == null or #lists.isEmpty(list)}">
+          <td colspan="4" class="text-muted py-4">데이터가 없습니다.</td>
+        </tr>
+        <tr th:each="row : ${list}">
+          <td th:text="${row.etfName}"></td>
+          <td th:text="${row.irpYn != null ? row.irpYn : '-'}"></td>
+          <td th:text="${row.totalCnt}"></td>
+          <td>
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary btn-holdings"
+                    th:data-etf-id="${row.etfId}"
+                    th:data-etf-name="${row.etfName}">
+              상세보기
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ================== Holdings Modal ================== -->
+  <div class="modal fade" id="holdingsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title">
+            구성 종목 – <span id="modalEtfName"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body" style="max-height:70vh; overflow-y:auto;">
+          <table class="table table-sm table-hover text-center align-middle">
+            <thead class="table-light">
+            <tr>
+              <th>종목코드</th>
+              <th>종목명</th>
+              <th>보유수량</th>
+              <th>비중(%)</th>
+              <th>평가금액</th>
+            </tr>
+            </thead>
+            <tbody id="holdingsTableBody">
+            <tr>
+              <td colspan="5" class="text-muted">상세보기를 눌러주세요.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================== Script ================== -->
+<th:block layout:fragment="script">
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const modalEl = document.getElementById("holdingsModal");
+      const modal = new bootstrap.Modal(modalEl);
+      const tbody = document.getElementById("holdingsTableBody");
+      const titleSpan = document.getElementById("modalEtfName");
+
+      /* 스크롤바 폭 보정 */
+      modalEl.addEventListener("show.bs.modal", () => {
+        const scrollbarWidth =
+                window.innerWidth - document.documentElement.clientWidth;
+
+        document.documentElement.classList.add("modal-open");
+        document.body.classList.add("modal-open");
+        document.body.style.paddingRight = scrollbarWidth + "px";
+      });
+
+      modalEl.addEventListener("hidden.bs.modal", () => {
+        document.documentElement.classList.remove("modal-open");
+        document.body.classList.remove("modal-open");
+        document.body.style.paddingRight = "";
+      });
+
+      document.querySelectorAll(".btn-holdings").forEach(btn => {
+        btn.addEventListener("click", async () => {
+
+          const etfId = btn.dataset.etfId;
+          const etfName = btn.dataset.etfName;
+
+          titleSpan.textContent = etfName;
+          tbody.innerHTML = `<tr><td colspan="5">로딩 중...</td></tr>`;
+          modal.show();
+
+          try {
+            const res = await fetch(`/kodex/holdings?etfId=${etfId}`);
+            const data = await res.json();
+
+            if (!data || data.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="5">데이터 없음</td></tr>`;
+              return;
+            }
+
+            tbody.innerHTML = "";
+            data.forEach(row => {
+              const holdingQty = row.holdingQty != null
+                      ? Number(row.holdingQty).toLocaleString()
+                      : "-";
+
+              const evalAmount = row.evalAmount != null
+                      ? Number(row.evalAmount).toLocaleString()
+                      : "-";
+
+              tbody.insertAdjacentHTML("beforeend", `
+                <tr>
+                  <td>${row.stockCode}</td>
+                  <td>${row.stockName}</td>
+                  <td>${holdingQty}</td>
+                  <td>${row.weightRatio ?? '-'}</td>
+                  <td>${evalAmount}</td>
+                </tr>
+              `);
+            });
+
+          } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="5">조회 실패</td></tr>`;
+          }
+        });
+      });
+    });
+  </script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>내 종목</title>
+
+    <style>
+        .page-link {
+            cursor: pointer;
+        }
+        .card-box {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 1.2rem;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        table th, table td {
+            vertical-align: middle;
+            font-size: 0.92rem;
+        }
+        .profit-row { background-color: #ffe5e5; }
+        .loss-row   { background-color: #e8f0ff; }
+        .same-row   { background-color: #f2f2f2; }
+
+        .price-up   { color: #d60000; font-weight: 600; }
+        .price-down { color: #0049b7; font-weight: 600; }
+        .price-same { color: #777; font-weight: 600; }
+    </style>
+</head>
+
+<body>
+
+<div layout:fragment="content" class="container mt-4" style="max-width:1400px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold">⭐ 내 관심 종목</h3>
+        <button class="btn btn-outline-secondary btn-sm" onclick="openHistoryModal()">
+            🕑 삭제된 종목 보기
+        </button>
+    </div>
+
+    <!-- ================= KR ================= -->
+    <h4 class="fw-bold mt-4">🇰🇷 한국 관심 종목</h4>
+    <div class="card card-box mb-3">
+        <table class="table table-hover text-center table-sm">
+            <thead class="table-light">
+            <tr>
+                <th>No</th><th>종목코드</th><th>종목명</th>
+                <th>현재가</th><th>추가가</th><th>+5%</th><th>+10%</th>
+                <th>전략</th><th>등록일</th><th>삭제</th>
+            </tr>
+            </thead>
+            <tbody id="kr-body"></tbody>
+        </table>
+    </div>
+    <ul class="pagination justify-content-center" id="kr-pagination"></ul>
+
+    <!-- ================= US ================= -->
+    <h4 class="fw-bold mt-5">🇺🇸 미국 관심 종목</h4>
+    <div class="card card-box mb-3">
+        <table class="table table-hover text-center table-sm">
+            <thead class="table-light">
+            <tr>
+                <th>No</th><th>종목코드</th><th>종목명</th>
+                <th>현재가</th><th>추가가</th><th>+5%</th><th>+10%</th>
+                <th>전략</th><th>등록일</th><th>삭제</th>
+            </tr>
+            </thead>
+            <tbody id="us-body"></tbody>
+        </table>
+    </div>
+    <ul class="pagination justify-content-center" id="us-pagination"></ul>
+
+    <!-- ================= Deleted Modal ================= -->
+    <div class="modal fade" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🕑 삭제된 관심 종목</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-sm table-hover text-center">
+                        <thead class="table-light">
+                        <tr>
+                            <th>No</th>
+                            <th>종목코드</th>
+                            <th>종목명</th>
+                            <th>삭제일</th>
+                            <th>복구</th>
+                        </tr>
+                        </thead>
+                        <tbody id="deletedListBody"></tbody>
+                    </table>
+
+                    <!-- 🔥 이거 추가 -->
+                    <ul class="pagination justify-content-center mt-2"
+                        id="deleted-pagination"></ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        let historyModalInstance;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadKR(1);
+            loadUS(1);
+        });
+
+        // ================= KR =================
+        function loadKR(page) {
+            fetch(`/mystock/list/kr?page=${page}`)
+                .then(res => res.json())
+                .then(data => {
+                    renderTable(data, "kr-body", true);
+                    renderPaging(data, "kr-pagination", loadKR);
+                });
+        }
+
+        // ================= US =================
+        function loadUS(page) {
+            fetch(`/mystock/list/us?page=${page}`)
+                .then(res => res.json())
+                .then(data => {
+                    renderTable(data, "us-body", false);
+                    renderPaging(data, "us-pagination", loadUS);
+                });
+        }
+
+        function renderTable(result, bodyId, isKR) {
+            const tbody = document.getElementById(bodyId);
+            tbody.innerHTML = "";
+
+            result.dtoList.forEach((s, i) => {
+                const rowClass =
+                    s.currentPrice > s.priceAtAdd ? "profit-row" :
+                        s.currentPrice < s.priceAtAdd ? "loss-row" : "same-row";
+
+                const priceClass =
+                    s.currentPrice > s.priceAtAdd ? "price-up" :
+                        s.currentPrice < s.priceAtAdd ? "price-down" : "price-same";
+
+                tbody.innerHTML += `
+                <tr class="${rowClass}">
+                    <td>${(result.page - 1) * result.size + i + 1}</td>
+                    <td>${s.code}</td>
+                    <td>${s.name}</td>
+                    <td class="${priceClass}">
+                        ${isKR ? s.currentPrice.toLocaleString()+" 원" : s.currentPrice+" $"}
+                    </td>
+                    <td>${isKR ? s.priceAtAdd.toLocaleString()+" 원" : s.priceAtAdd+" $"}</td>
+                    <td>${isKR ? s.targetPrice5.toLocaleString()+" 원" : s.targetPrice5+" $"}</td>
+                    <td>${isKR ? s.targetPrice10.toLocaleString()+" 원" : s.targetPrice10+" $"}</td>
+                    <td>${s.strategyName}</td>
+                    <td>${s.createdAt.substring(0,10)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger"
+                            onclick="deleteMyStock(${s.id})">삭제</button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function renderPaging(result, ulId, handler) {
+            const ul = document.getElementById(ulId);
+            ul.innerHTML = "";
+
+            if (result.prev) {
+                ul.innerHTML += `<li class="page-item">
+                <a class="page-link" onclick="${handler.name}(${result.start - 1})">이전</a>
+            </li>`;
+            }
+
+            for (let p = result.start; p <= result.end; p++) {
+                ul.innerHTML += `<li class="page-item ${p === result.page ? 'active':''}">
+                <a class="page-link" onclick="${handler.name}(${p})">${p}</a>
+            </li>`;
+            }
+
+            if (result.next) {
+                ul.innerHTML += `<li class="page-item">
+                <a class="page-link" onclick="${handler.name}(${result.end + 1})">다음</a>
+            </li>`;
+            }
+        }
+
+        // ===== 기존 버튼 로직 (유지) =====
+        function deleteMyStock(id) {
+            if (!confirm("삭제하시겠습니까?")) return;
+            fetch("/mystock/delete/" + id, { method: "POST" })
+                .then(() => {
+                    loadKR(1);
+                    loadUS(1);
+                });
+        }
+
+        function openHistoryModal(page = 1) {
+            fetch(`/mystock/deleted?page=${page}`)
+                .then(res => res.json())
+                .then(result => {
+                    const tbody = document.getElementById("deletedListBody");
+                    tbody.innerHTML = "";
+
+                    result.dtoList.forEach((s, i) => {
+                        tbody.innerHTML += `
+                <tr>
+                    <td>${(result.page - 1) * result.size + i + 1}</td>
+                    <td>${s.code}</td>
+                    <td>${s.name}</td>
+                    <td>${s.deletedAt.replace("T", " ")}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary"
+                            onclick="restoreMyStock(${s.id})">복구</button>
+                    </td>
+                </tr>`;
+                    });
+
+                    renderDeletedPaging(result);
+                    // 🔥 여기 중요
+                    if (!historyModalInstance) {
+                        historyModalInstance = new bootstrap.Modal(
+                            document.getElementById("historyModal")
+                        );
+                    }
+                    historyModalInstance.show();
+                });
+        }
+
+        function renderDeletedPaging(result) {
+            let html = "";
+
+            if (result.prev) {
+                html += `<li class="page-item">
+            <a class="page-link" onclick="openHistoryModal(${result.start - 1})">이전</a>
+        </li>`;
+            }
+
+            for (let p = result.start; p <= result.end; p++) {
+                html += `<li class="page-item ${p === result.page ? 'active' : ''}">
+            <a class="page-link" onclick="openHistoryModal(${p})">${p}</a>
+        </li>`;
+            }
+
+            if (result.next) {
+                html += `<li class="page-item">
+            <a class="page-link" onclick="openHistoryModal(${result.end + 1})">다음</a>
+        </li>`;
+            }
+
+            document.getElementById("deleted-pagination").innerHTML = html;
+        }
+
+
+        function restoreMyStock(id) {
+            if (!confirm("복구하시겠습니까?")) return;
+            fetch("/mystock/restore/" + id, { method: "POST" })
+                .then(() => {
+                    bootstrap.Modal.getInstance(
+                        document.getElementById("historyModal")
+                    ).hide();
+                    loadKR(1);
+                    loadUS(1);
+                });
+        }
+
+    </script>
+</th:block>
+
+</body>
+</html>

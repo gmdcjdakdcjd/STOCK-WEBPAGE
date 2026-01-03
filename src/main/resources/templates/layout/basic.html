@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>STOCK PROJECT</title>
+
+    <!-- Bootstrap Theme CSS -->
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+
+    <style>
+        .nav-ani {
+            position: relative;
+            font-weight: 500;
+            padding: 0.5rem 1.05rem; /* ← 기존 0.8 → 1.05 */
+            transition: color 0.2s ease-in-out;
+        }
+
+        .navbar-nav.mx-auto .nav-item {
+            margin: 0 0.15rem;
+        }
+
+        /* 기본 밑줄 (숨겨져 있음) */
+        .nav-ani::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 0%;
+            height: 2px;
+            background: #5a33ff;
+            transition: width 0.25s ease-in-out;
+        }
+
+        /* Hover 시 밑줄 애니메이션 */
+        .nav-ani:hover::after {
+            width: 100%;
+        }
+
+        /* Hover 글자 강조 */
+        .nav-ani:hover {
+            color: #5a33ff !important;
+        }
+
+        /* Active 상태 (현재 URL) */
+        .nav-ani.active::after {
+            width: 100%;
+        }
+
+        .nav-ani.active {
+            color: #5a33ff !important;
+            font-weight: 600;
+        }
+
+        html {
+            overflow-y: scroll;
+        }
+
+        /* ✅ Bootstrap modal scrollbar shift fix */
+        body.modal-open {
+            padding-right: 0 !important;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- 🌟 상단 Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2">
+    <div class="container-fluid">
+
+        <!-- 로고 -->
+        <a class="navbar-brand fw-bold" href="/" style="font-size:1.25rem;">
+            STOCK PROJECT
+        </a>
+
+        <!-- 모바일 토글 -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarMenu"
+                aria-controls="navbarMenu" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- 메뉴 -->
+        <div class="collapse navbar-collapse" id="navbarMenu">
+
+            <!-- 가운데 메뉴 -->
+            <ul class="navbar-nav mx-auto align-items-center">
+
+                <li class="nav-item"><a class="nav-link nav-ani" href="/board/indicator">📉 주요 지수</a></li>
+                <li class="nav-item"><a class="nav-link nav-ani" href="/board/bond">🏦 채권</a></li>
+                <li class="nav-item"><a class="nav-link nav-ani" href="/board/issue">🔥 이슈 종목</a></li>
+                <li class="nav-item"><a class="nav-link nav-ani" href="/board/listKR">🇰🇷 국장</a></li>
+                <li class="nav-item"><a class="nav-link nav-ani" href="/board/listUS">🇺🇸 미국장</a></li>
+                <li class="nav-item"><a class="nav-link nav-ani" href="/board/dualMomentumList">📈 수익률 상위</a></li>
+                <li class="nav-item"><a class="nav-link nav-ani" href="/board/stockInfo">🔍 종목검색</a></li>
+                <li class="nav-item"><a class="nav-link nav-ani" href="/kodex/summary">📊 ETF검색</a></li>
+                <li class="nav-item"><a class="nav-link nav-ani" href="/nps/summary">🏛️ 연기금 현황</a></li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link nav-ani" href="/mystock/list">⭐ 나의 관심 종목</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link nav-ani" href="/myetf/list">🗂️    나의 ETF 리스트</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link nav-ani" href="/manage/batch/history">🛠 배치 목록</a>
+                </li>
+            </ul>
+
+            <!-- 오른쪽 로그인/로그아웃 -->
+            <ul class="navbar-nav ms-3 align-items-center">
+
+
+                <!-- 로그인 안 된 상태 -->
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link nav-ani" th:href="@{/member/join}">회원가입</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link nav-ani" th:href="@{/member/login}">로그인</a>
+                </li>
+
+                <!-- 로그인 된 상태 -->
+                <li class="nav-item d-flex align-items-center" sec:authorize="isAuthenticated()">
+                    <span class="me-2">👤 <span sec:authentication="principal.mid"></span></span>
+                </li>
+
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="nav-link btn btn-link p-0 nav-ani">
+                            로그아웃
+                        </button>
+                    </form>
+                </li>
+
+
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+<!-- 🌟 페이지 컨텐츠 (footer 밀어주는 영역) -->
+<div id="page-content-wrapper" class="container-fluid px-4 py-3">
+    <div layout:fragment="content"></div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-auto border-top py-3 bg-light text-center small text-muted">
+    <div th:replace="layout/footer :: footerFragment"></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const current = window.location.pathname;
+        document.querySelectorAll(".nav-ani").forEach(a => {
+            if (a.getAttribute("href") && current.startsWith(a.getAttribute("href"))) {
+                a.classList.add("active");
+            }
+        });
+    });
+</script>
+
+
+<th:block layout:fragment="script"></th:block>
+
+</body>
+
+<style>
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 페이지 내용이 작을 때 남는 공간을 footer 아래로 밀어줌 */
+    #page-content-wrapper {
+        flex: 1;
+    }
+</style>
+
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>국민연금 보유 종목</title>
+</head>
+
+<body>
+<div layout:fragment="content" class="container mt-4">
+
+    <!-- 제목 -->
+    <h3 class="fw-bold mb-2">
+        국민연금 보유 종목
+        <small class="text-muted">
+            ([[${asset}]] / [[${market}]])
+        </small>
+    </h3>
+
+    <!-- 안내 -->
+    <div class="text-muted small mb-3">
+        ※ 최신 기준일 기준 상위 보유 항목 순서입니다.
+    </div>
+
+    <!-- 🔍 검색 영역 -->
+    <!-- 🔍 검색 영역 -->
+    <form method="get" class="mb-4">
+        <input type="hidden" name="asset" th:value="${asset}">
+        <input type="hidden" name="market" th:value="${market}">
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8 position-relative">
+
+                <div class="input-group">
+                    <input type="text"
+                           id="searchInput"
+                           name="q"
+                           class="form-control form-control-lg"
+                           placeholder="보유 여부 확인할 종목명 (예: 삼성전자, 엔비디아)"
+                           th:value="${q}">
+
+                    <button class="btn btn-primary px-4">
+                        검색
+                    </button>
+
+                    <a th:if="${q != null and q != ''}"
+                       th:href="@{/nps/list(asset=${asset}, market=${market})}"
+                       class="btn btn-outline-secondary px-4">
+                        초기화
+                    </a>
+                </div>
+
+                <!-- 자동완성 -->
+                <div id="autocompleteBox"
+                     class="list-group position-absolute w-100 shadow-sm"
+                     style="z-index:1000; display:none; max-height:220px; overflow-y:auto;">
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+
+    <!-- 리스트 테이블 -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-sm table-hover mb-0 text-center align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>순위</th>
+                    <th>종목명</th>
+                    <th>자산군 내 비중 (%)</th>
+                    <th>지분율 (%)</th>
+                    <th>평가액 (억)</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <!-- 데이터 없음 -->
+                <tr th:if="${list == null or #lists.isEmpty(list)}">
+                    <td colspan="5" class="text-muted py-4">
+                        검색 결과가 없습니다.
+                    </td>
+                </tr>
+
+                <!-- 데이터 있음 -->
+                <tr th:each="row : ${list}">
+                    <!-- 순위 -->
+                    <td th:text="${row.rankNo}"></td>
+
+                    <!-- 종목명 -->
+                    <td>
+                        <!-- STOCK + KR 만 링크 -->
+                        <a th:if="${asset == 'STOCK' and market == 'KR'}"
+                           th:href="@{/board/searchStock(stockName=${row.name})}"
+                           th:text="${row.name}">
+                        </a>
+
+                        <!-- 나머지는 텍스트 -->
+                        <span th:if="${!(asset == 'STOCK' and market == 'KR')}"
+                              th:text="${row.name}">
+                        </span>
+                    </td>
+
+                    <!-- 비중 -->
+                    <td th:text="${row.weightPct != null ? row.weightPct : '-'}"></td>
+
+                    <!-- 지분율 (STOCK만 의미 있음) -->
+                    <td th:text="${asset == 'STOCK' && row.ownershipPct != null ? row.ownershipPct : '-'}"></td>
+
+                    <!-- 평가액 -->
+                    <td th:text="${row.evalAmountDisplay != null ? row.evalAmountDisplay : '-'}"></td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ================== 자동완성 Script ================== -->
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const input = document.getElementById("searchInput");
+            const box = document.getElementById("autocompleteBox");
+
+            const asset = "[[${asset}]]";
+            const market = "[[${market}]]";
+
+            input.addEventListener("keyup", async () => {
+                const keyword = input.value.trim();
+
+                if (keyword.length < 2) {
+                    box.style.display = "none";
+                    box.innerHTML = "";
+                    return;
+                }
+
+                try {
+                    const res = await fetch(
+                        `/nps/autocomplete?asset=${asset}&market=${market}&q=${encodeURIComponent(keyword)}`
+                    );
+                    const data = await res.json();
+
+                    if (!data || data.length === 0) {
+                        box.style.display = "none";
+                        return;
+                    }
+
+                    box.innerHTML = "";
+                    box.style.display = "block";
+
+                    data.forEach(name => {
+                        const item = document.createElement("button");
+                        item.type = "button";
+                        item.className = "list-group-item list-group-item-action";
+                        item.textContent = name;
+
+                        item.onclick = () => {
+                            input.value = name;
+                            box.style.display = "none";
+                        };
+
+                        box.appendChild(item);
+                    });
+
+                } catch (e) {
+                    box.style.display = "none";
+                }
+            });
+
+            // 바깥 클릭 시 닫기
+            document.addEventListener("click", (e) => {
+                if (!box.contains(e.target) && e.target !== input) {
+                    box.style.display = "none";
+                }
+            });
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

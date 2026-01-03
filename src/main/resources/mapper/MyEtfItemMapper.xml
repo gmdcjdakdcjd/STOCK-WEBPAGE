@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.MyEtfItemMapper">
+
+    <!-- ETF 요약 -->
+    <select id="selectMyEtfSummary" resultType="map">
+        SELECT
+            etf_name AS etfName,
+            MAX(etf_description) AS etfDescription,
+            COUNT(id) AS itemCount,
+            SUM(COALESCE(price_at_add, 0) * quantity) AS investedAmount
+        FROM my_etf_item
+        WHERE user_id = #{userId}
+          AND deleted_yn = 'N'
+        GROUP BY etf_name
+        HAVING COUNT(id) > 0
+        ORDER BY MIN(created_at) DESC
+    </select>
+
+    <!-- ETF 종목 목록 -->
+    <select id="selectEtfItemList" resultType="com.stock.webpage.dto.MyEtfItemDTO">
+        SELECT *
+        FROM my_etf_item
+        WHERE user_id = #{userId}
+          AND etf_name = #{etfName}
+          AND deleted_yn = #{deletedYn}
+        ORDER BY created_at ASC
+    </select>
+
+    <!-- ETF 설명 조회 -->
+    <select id="selectEtfDescription" resultType="string">
+        SELECT etf_description
+        FROM my_etf_item
+        WHERE user_id = #{userId}
+          AND etf_name = #{etfName}
+          AND deleted_yn = 'N'
+            LIMIT 1
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="selectByIdAndUserId" resultType="com.stock.webpage.dto.MyEtfItemDTO">
+        SELECT *
+        FROM my_etf_item
+        WHERE id = #{id}
+          AND user_id = #{userId}
+    </select>
+
+    <select id="selectByUserIdEtfNameCode" resultType="com.stock.webpage.dto.MyEtfItemDTO">
+        SELECT *
+        FROM my_etf_item
+        WHERE user_id = #{userId}
+          AND etf_name = #{etfName}
+          AND code = #{code}
+            LIMIT 1
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insertEtfItem" parameterType="com.stock.webpage.dto.MyEtfItemDTO"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO my_etf_item (
+            user_id,
+            code,
+            name,
+            etf_name,
+            etf_description,
+            price_at_add,
+            quantity,
+            memo,
+            deleted_yn
+        ) VALUES (
+                     #{dto.userId},
+                     #{dto.code},
+                     #{dto.name},
+                     #{dto.etfName},
+                     #{dto.etfDescription},
+                     #{dto.priceAtAdd},
+                     #{dto.quantity},
+                     #{dto.memo},
+                     'N'
+                 )
+    </insert>
+
+    <!-- ETF 전체 soft delete -->
+    <delete id="deleteByUserIdAndEtfName">
+        DELETE FROM my_etf_item
+        WHERE user_id = #{userId}
+          AND etf_name = #{etfName}
+    </delete>
+
+    <!-- ETF 설명 수정 -->
+    <update id="updateEtfDescription">
+        UPDATE my_etf_item
+        SET etf_description = #{etfDescription}
+        WHERE user_id = #{userId}
+          AND etf_name = #{etfName}
+          AND deleted_yn = 'N'
+    </update>
+
+    <!-- ETF 이름 목록 -->
+    <select id="selectDistinctEtfName" resultType="string">
+        SELECT DISTINCT etf_name
+        FROM my_etf_item
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- ✅ soft delete 복구 (단건) -->
+    <update id="restoreById">
+        UPDATE my_etf_item
+        SET deleted_yn = 'N',
+            deleted_at = NULL
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND deleted_yn = 'Y'
+    </update>
+
+    <!-- soft delete (단건) -->
+    <update id="softDeleteById">
+        UPDATE my_etf_item
+        SET deleted_yn = 'Y',
+            deleted_at = NOW()
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND deleted_yn = 'N'
+    </update>
+
+    <select id="countByUserIdAndEtfName" resultType="int">
+        SELECT COUNT(*)
+        FROM my_etf_item
+        WHERE user_id = #{userId}
+          AND etf_name = #{etfName}
+    </select>
+
+    <select id="countMyEtf" resultType="int">
+        SELECT COUNT(DISTINCT etf_name)
+        FROM my_etf_item
+        WHERE user_id = #{userId}
+          AND deleted_yn = 'N'
+    </select>
+
+    <select id="selectMyEtfSummaryPaging" resultType="map">
+        SELECT
+            etf_name AS etfName,
+            MAX(etf_description) AS etfDescription,
+            COUNT(id) AS itemCount,
+            SUM(COALESCE(price_at_add, 0) * quantity) AS investedAmount
+        FROM my_etf_item
+        WHERE user_id = #{userId}
+          AND deleted_yn = 'N'
+        GROUP BY etf_name
+        ORDER BY MIN(created_at) DESC
+            LIMIT #{page.limit}
+        OFFSET #{page.offset}
+    </select>
+
+
+</mapper>

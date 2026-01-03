@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LOGIN</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+
+<body>
+
+<div layout:fragment="content"
+     class="container d-flex justify-content-center align-items-center"
+     style="min-height:100vh;">
+
+    <div class="card shadow-sm" style="width:420px;">
+        <div class="card-body px-4 py-4">
+
+            <h4 class="text-center mb-4 fw-bold">로그인</h4>
+
+            <!-- 가입 완료 메시지 -->
+            <div th:if="${param.joined != null}"
+                 class="alert alert-success text-center py-2 mb-3">
+                회원가입이 완료되었습니다. 로그인해주세요.
+            </div>
+
+            <!-- 로그인 실패 메시지 -->
+            <div th:if="${param.error != null and param.error[0] == 'true'}"
+                 class="alert alert-danger text-center py-2 mb-3">
+                아이디 또는 비밀번호가 올바르지 않습니다.
+            </div>
+
+            <form id="loginForm" action="/member/login" method="post">
+
+                <!-- USERNAME -->
+                <div class="mb-3">
+                    <label class="form-label">아이디 또는 이메일</label>
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           class="form-control"
+                           placeholder="아이디 또는 이메일 입력"
+                           autocomplete="username"
+                           required>
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="mb-3">
+                    <label class="form-label">비밀번호</label>
+                    <input type="password"
+                           name="password"
+                           class="form-control"
+                           placeholder="비밀번호 입력"
+                           autocomplete="current-password"
+                           required>
+                </div>
+
+                <!-- ID 저장 -->
+                <div class="form-check mb-4">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="saveId">
+                    <label class="form-check-label" for="saveId">
+                        아이디 저장
+                    </label>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        로그인
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        // -----------------------------
+        // ID 저장 처리
+        // -----------------------------
+        const usernameInput = document.getElementById('username');
+        const saveIdCheckbox = document.getElementById('saveId');
+        const loginForm = document.getElementById('loginForm');
+
+        // 페이지 로드 시 저장된 ID 복원
+        const savedId = localStorage.getItem('savedLoginId');
+        if (savedId) {
+            usernameInput.value = savedId;
+            saveIdCheckbox.checked = true;
+        }
+
+        // 로그인 시 ID 저장 여부 처리
+        loginForm.addEventListener('submit', () => {
+            if (saveIdCheckbox.checked) {
+                localStorage.setItem('savedLoginId', usernameInput.value);
+            } else {
+                localStorage.removeItem('savedLoginId');
+            }
+        });
+
+        // URL 파라미터 정리
+        if (/*[[${param.error != null or param.joined != null}]]*/ false) {
+            history.replaceState({}, '', '/member/login');
+        }
+    </script>
+</th:block>
+
+</body>
+</html>

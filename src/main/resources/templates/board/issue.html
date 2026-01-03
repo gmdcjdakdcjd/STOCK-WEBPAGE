@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘의 전략별 결과 요약</title>
+
+    <style>
+        .dashboard-card {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 1.2rem;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        .content-box {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        table {
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        th {
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            padding: 6px;
+        }
+        td {
+            padding: 6px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .col-code {
+            width: auto;
+        }
+        .col-price {
+            width: 150px;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .col-prev {
+            width: 150px;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .col-diff {
+            width: 150px;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .col-volume {
+            width: 150px;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .col-date {
+            width: 150px;
+            text-align: center;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content" class="container mt-4">
+    <h3 class="fw-bold mb-4">📊 오늘의 전략별 결과 요약</h3>
+
+    <!-- ============================= -->
+    <!-- 🇰🇷 한국 전략 섹션 -->
+    <!-- ============================= -->
+    <h4 class="fw-bold mt-5">🇰🇷 한국 전략</h4>
+
+    <div th:each="entry : ${strategyMap}"
+         th:if="${entry.key.endsWith('_KR')}"
+         class="dashboard-card">
+
+        <h5 th:text="${entry.key}" class="text-primary"></h5>
+
+        <div class="content-box">
+            <table>
+                <thead>
+                <tr>
+                    <th class="col-code">종목</th>
+                    <th class="col-price">가격</th>
+                    <th class="col-prev">전일</th>
+                    <th class="col-diff">변동</th>
+                    <th class="col-volume">거래량</th>
+                    <th class="col-date">날짜</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="dto : ${entry.value}">
+                    <td class="col-code">
+                        <span th:text="${dto.code}"></span>
+                        &nbsp;
+                        <span th:text="${dto.name}"></span>
+                    </td>
+                    <td class="col-price"   th:text="${#numbers.formatInteger(dto.price, 1, 'COMMA') + ' 원'}"></td>
+                    <td class="col-prev"    th:text="${#numbers.formatInteger(dto.prevClose, 1, 'COMMA') + ' 원'}"></td>
+                    <td class="col-diff"    th:text="${dto.diff + '%'}"></td>
+                    <td class="col-volume"
+                        th:text="${#numbers.formatInteger(dto.volume, 0, 'COMMA')}"></td>
+                    <td class="col-date"    th:text="${dto.signalDate}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- 🇺🇸 미국 전략 섹션 -->
+    <!-- ============================= -->
+    <h4 class="fw-bold mt-5">🇺🇸 미국 전략</h4>
+
+    <div th:each="entry : ${strategyMap}"
+         th:if="${entry.key.endsWith('_US')}"
+         class="dashboard-card">
+
+        <h5 th:text="${entry.key}" class="text-primary"></h5>
+
+        <div class="content-box">
+            <table>
+                <thead>
+                <tr>
+                    <th class="col-code">종목</th>
+                    <th class="col-price">가격</th>
+                    <th class="col-prev">전일</th>
+                    <th class="col-diff">변동</th>
+                    <th class="col-volume">거래량</th>
+                    <th class="col-date">날짜</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="dto : ${entry.value}">
+                    <td class="col-code">
+                        <span th:text="${dto.code}"></span>
+                        &nbsp;
+                        <span th:text="${dto.name}"></span>
+                    </td>
+                    <td class="col-price"   th:text="${dto.price + '$'}"></td>
+                    <td class="col-prev"    th:text="${dto.prevClose + '$'}"></td>
+                    <td class="col-diff"    th:text="${dto.diff + '%'}"></td>
+                    <td class="col-volume"
+                        th:text="${#numbers.formatInteger(dto.volume, 0, 'COMMA')}"></td>
+                    <td class="col-date"    th:text="${dto.signalDate}"></td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

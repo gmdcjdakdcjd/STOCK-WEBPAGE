@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.KodexEtfHoldingsMapper">
+
+    <!-- =========================
+         ETF → 종목 (모달)
+         ========================= -->
+    <select id="selectHoldingsByEtfIdOrderByWeight"
+            resultType="com.stock.webpage.dto.KodexEtfHoldingsDTO">
+        SELECT
+            etf_id        AS etfId,
+            base_date     AS baseDate,
+            stock_code    AS stockCode,
+            stock_name    AS stockName,
+            holding_qty   AS holdingQty,
+            current_price AS currentPrice,
+            eval_amount   AS evalAmount,
+            weight_ratio  AS weightRatio,
+            last_update   AS lastUpdate
+        FROM kodex_etf_holdings
+        WHERE etf_id = #{etfId}
+        ORDER BY
+            CASE WHEN weight_ratio IS NULL THEN 0 ELSE 1 END ASC,
+            weight_ratio DESC
+    </select>
+
+    <!-- =========================
+         종목 → ETF ID 목록
+         ========================= -->
+    <select id="selectEtfIdsByKeyword" resultType="string">
+        SELECT DISTINCT etf_id
+        FROM kodex_etf_holdings
+        WHERE
+            LOWER(stock_code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+           OR
+            LOWER(stock_name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+    </select>
+
+</mapper>

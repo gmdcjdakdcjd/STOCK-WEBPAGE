@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JOIN</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+
+<body>
+
+<div layout:fragment="content"
+     class="container d-flex justify-content-center align-items-center"
+     style="min-height:100vh;">
+
+    <div class="card shadow-sm" style="width:420px;">
+        <div class="card-body px-4 py-4">
+
+            <h4 class="text-center mb-4 fw-bold">회원가입</h4>
+
+            <form id="joinForm" action="/member/join" method="post">
+
+                <!-- =========================
+                     MID
+                     ========================= -->
+                <div class="mb-3">
+                    <label class="form-label">아이디</label>
+                    <div class="input-group">
+                        <input type="text"
+                               id="mid"
+                               name="mid"
+                               class="form-control"
+                               placeholder="아이디 입력"
+                               required>
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="checkMid()">중복확인</button>
+                    </div>
+                    <div id="midMsg" class="form-text"></div>
+                </div>
+
+                <!-- =========================
+                     EMAIL
+                     ========================= -->
+                <div class="mb-3">
+                    <label class="form-label">이메일</label>
+                    <div class="input-group">
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               class="form-control"
+                               placeholder="example@email.com"
+                               required>
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="checkEmail()">중복확인</button>
+                    </div>
+                    <div id="emailMsg" class="form-text"></div>
+                </div>
+
+                <!-- =========================
+                     MPW
+                     ========================= -->
+                <div class="mb-4">
+                    <label class="form-label">비밀번호</label>
+                    <input type="password"
+                           name="mpw"
+                           class="form-control"
+                           placeholder="비밀번호 입력"
+                           required>
+                </div>
+
+                <!-- =========================
+                     Buttons
+                     ========================= -->
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        회원가입
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary">
+                        초기화
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- =========================
+     Script Fragment
+     ========================= -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+        /* =========================
+           서버 결과 처리
+           ========================= */
+        const error = /*[[${error}]]*/ null;
+        const result = /*[[${result}]]*/ null;
+
+        if (error === 'mid') {
+            alert('이미 사용 중인 아이디입니다.');
+        } else if (error === 'email') {
+            alert('이미 사용 중인 이메일입니다.');
+        } else if (error !== null) {
+            alert('회원가입 중 오류가 발생했습니다.');
+        }
+
+        if (result === 'success') {
+            alert('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.');
+            location.href = '/member/login';
+        }
+
+        /* =========================
+           상태값
+           ========================= */
+        let midChecked = false;
+        let emailChecked = false;
+
+        const midInput = document.getElementById('mid');
+        const emailInput = document.getElementById('email');
+        const midMsg = document.getElementById('midMsg');
+        const emailMsg = document.getElementById('emailMsg');
+
+        /* =========================
+           입력 변경 시 초기화
+           ========================= */
+        midInput.addEventListener('input', () => {
+            midChecked = false;
+            midMsg.textContent = '';
+            midMsg.className = 'form-text';
+        });
+
+        emailInput.addEventListener('input', () => {
+            emailChecked = false;
+            emailMsg.textContent = '';
+            emailMsg.className = 'form-text';
+        });
+
+        /* =========================
+           MID 중복 확인
+           ========================= */
+        function checkMid() {
+            const mid = midInput.value.trim();
+
+            if (!mid) {
+                alert('아이디를 입력하세요.');
+                return;
+            }
+
+            fetch(`/member/checkMid?mid=${mid}`)
+                .then(res => res.json())
+                .then(ok => {
+                    if (ok) {
+                        midChecked = true;
+                        midMsg.textContent = '사용 가능한 아이디입니다.';
+                        midMsg.className = 'form-text text-success';
+                    } else {
+                        midChecked = false;
+                        midMsg.textContent = '이미 사용 중인 아이디입니다.';
+                        midMsg.className = 'form-text text-danger';
+                    }
+                });
+        }
+
+        /* =========================
+           EMAIL 중복 확인
+           ========================= */
+        function checkEmail() {
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                alert('이메일을 입력하세요.');
+                return;
+            }
+
+            fetch(`/member/checkEmail?email=${email}`)
+                .then(res => res.json())
+                .then(ok => {
+                    if (ok) {
+                        emailChecked = true;
+                        emailMsg.textContent = '사용 가능한 이메일입니다.';
+                        emailMsg.className = 'form-text text-success';
+                    } else {
+                        emailChecked = false;
+                        emailMsg.textContent = '이미 사용 중인 이메일입니다.';
+                        emailMsg.className = 'form-text text-danger';
+                    }
+                });
+        }
+
+        /* =========================
+           submit 전 최종 검증
+           ========================= */
+        document.getElementById('joinForm').addEventListener('submit', function (e) {
+
+            if (!midChecked) {
+                alert('아이디 중복확인을 해주세요.');
+                e.preventDefault();
+                return;
+            }
+
+            if (!emailChecked) {
+                alert('이메일 중복확인을 해주세요.');
+                e.preventDefault();
+            }
+        });
+
+    </script>
+</th:block>
+
+</body>
+</html>
