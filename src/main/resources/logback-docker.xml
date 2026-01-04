@@ -2,13 +2,13 @@
 <configuration>
 
     <!-- ========================= -->
-    <!-- 로그 경로 -->
+    <!-- Docker 로그 경로 -->
     <!-- ========================= -->
-    <property name="LOG_PATH" value="D:/STOCK_PROJECT_V2/LOCAL_STOCK_LOGS"/>
+    <property name="LOG_PATH" value="/logs"/>
     <property name="LOG_FILE" value="${LOG_PATH}/batch.log"/>
 
     <!-- ========================= -->
-    <!-- 콘솔 로그 -->
+    <!-- 콘솔 로그 (docker logs) -->
     <!-- ========================= -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

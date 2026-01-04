@@ -15,7 +15,7 @@
         .nav-ani {
             position: relative;
             font-weight: 500;
-            padding: 0.5rem 1.05rem; /* ← 기존 0.8 → 1.05 */
+            padding: 0.5rem 1.05rem;
             transition: color 0.2s ease-in-out;
         }
 
@@ -23,7 +23,6 @@
             margin: 0 0.15rem;
         }
 
-        /* 기본 밑줄 (숨겨져 있음) */
         .nav-ani::after {
             content: "";
             position: absolute;
@@ -35,17 +34,14 @@
             transition: width 0.25s ease-in-out;
         }
 
-        /* Hover 시 밑줄 애니메이션 */
         .nav-ani:hover::after {
             width: 100%;
         }
 
-        /* Hover 글자 강조 */
         .nav-ani:hover {
             color: #5a33ff !important;
         }
 
-        /* Active 상태 (현재 URL) */
         .nav-ani.active::after {
             width: 100%;
         }
@@ -55,13 +51,19 @@
             font-weight: 600;
         }
 
+        /* 항상 스크롤바 공간 확보 (레이아웃 흔들림 방지) */
         html {
-            overflow-y: scroll;
+            scrollbar-gutter: stable;
         }
 
-        /* ✅ Bootstrap modal scrollbar shift fix */
+        /* Bootstrap 기본 scrollbar 보정 제거 */
         body.modal-open {
             padding-right: 0 !important;
+        }
+
+        /* 🔑 핵심: 모달 열릴 때 "밖(배경)" 스크롤만 차단 */
+        body.modal-open #page-content-wrapper {
+            overflow: hidden;
         }
     </style>
 
@@ -73,12 +75,10 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2">
     <div class="container-fluid">
 
-        <!-- 로고 -->
         <a class="navbar-brand fw-bold" href="/" style="font-size:1.25rem;">
             STOCK PROJECT
         </a>
 
-        <!-- 모바일 토글 -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarMenu"
                 aria-controls="navbarMenu" aria-expanded="false"
@@ -86,12 +86,9 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- 메뉴 -->
         <div class="collapse navbar-collapse" id="navbarMenu">
 
-            <!-- 가운데 메뉴 -->
             <ul class="navbar-nav mx-auto align-items-center">
-
                 <li class="nav-item"><a class="nav-link nav-ani" href="/board/indicator">📉 주요 지수</a></li>
                 <li class="nav-item"><a class="nav-link nav-ani" href="/board/bond">🏦 채권</a></li>
                 <li class="nav-item"><a class="nav-link nav-ani" href="/board/issue">🔥 이슈 종목</a></li>
@@ -105,18 +102,14 @@
                     <a class="nav-link nav-ani" href="/mystock/list">⭐ 나의 관심 종목</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link nav-ani" href="/myetf/list">🗂️    나의 ETF 리스트</a>
+                    <a class="nav-link nav-ani" href="/myetf/list">🗂️ 나의 ETF 리스트</a>
                 </li>
                 <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link nav-ani" href="/manage/batch/history">🛠 배치 목록</a>
                 </li>
             </ul>
 
-            <!-- 오른쪽 로그인/로그아웃 -->
             <ul class="navbar-nav ms-3 align-items-center">
-
-
-                <!-- 로그인 안 된 상태 -->
                 <li class="nav-item" sec:authorize="isAnonymous()">
                     <a class="nav-link nav-ani" th:href="@{/member/join}">회원가입</a>
                 </li>
@@ -124,7 +117,6 @@
                     <a class="nav-link nav-ani" th:href="@{/member/login}">로그인</a>
                 </li>
 
-                <!-- 로그인 된 상태 -->
                 <li class="nav-item d-flex align-items-center" sec:authorize="isAuthenticated()">
                     <span class="me-2">👤 <span sec:authentication="principal.mid"></span></span>
                 </li>
@@ -136,16 +128,13 @@
                         </button>
                     </form>
                 </li>
-
-
             </ul>
 
         </div>
     </div>
 </nav>
 
-
-<!-- 🌟 페이지 컨텐츠 (footer 밀어주는 영역) -->
+<!-- 🌟 페이지 컨텐츠 -->
 <div id="page-content-wrapper" class="container-fluid px-4 py-3">
     <div layout:fragment="content"></div>
 </div>
@@ -168,10 +157,7 @@
     });
 </script>
 
-
 <th:block layout:fragment="script"></th:block>
-
-</body>
 
 <style>
     body {
@@ -180,10 +166,10 @@
         flex-direction: column;
     }
 
-    /* 페이지 내용이 작을 때 남는 공간을 footer 아래로 밀어줌 */
     #page-content-wrapper {
         flex: 1;
     }
 </style>
 
+</body>
 </html>

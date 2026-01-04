@@ -7,19 +7,13 @@
   <title>KODEX ETF 요약</title>
 
   <style>
-    /* 항상 스크롤바 공간 확보 (레이아웃 고정) */
+    /* ✅ 스크롤바 공간은 유지하되, 스크롤 제어는 Bootstrap에게 맡김 */
     html {
-      overflow-y: scroll;
+      scrollbar-gutter: stable;
     }
 
-    /* 모달 열릴 때 배경 스크롤 차단 */
-    html.modal-open,
+    /* Bootstrap modal 기본 동작 */
     body.modal-open {
-      overflow: hidden;
-    }
-
-    /* 실제 스크롤 주체(wrapper) 차단 */
-    body.modal-open #page-content-wrapper {
       overflow: hidden;
     }
   </style>
@@ -130,22 +124,6 @@
       const tbody = document.getElementById("holdingsTableBody");
       const titleSpan = document.getElementById("modalEtfName");
 
-      /* 스크롤바 폭 보정 */
-      modalEl.addEventListener("show.bs.modal", () => {
-        const scrollbarWidth =
-                window.innerWidth - document.documentElement.clientWidth;
-
-        document.documentElement.classList.add("modal-open");
-        document.body.classList.add("modal-open");
-        document.body.style.paddingRight = scrollbarWidth + "px";
-      });
-
-      modalEl.addEventListener("hidden.bs.modal", () => {
-        document.documentElement.classList.remove("modal-open");
-        document.body.classList.remove("modal-open");
-        document.body.style.paddingRight = "";
-      });
-
       document.querySelectorAll(".btn-holdings").forEach(btn => {
         btn.addEventListener("click", async () => {
 
@@ -170,7 +148,6 @@
               const holdingQty = row.holdingQty != null
                       ? Number(row.holdingQty).toLocaleString()
                       : "-";
-
               const evalAmount = row.evalAmount != null
                       ? Number(row.evalAmount).toLocaleString()
                       : "-";
