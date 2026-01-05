@@ -2,10 +2,20 @@
 <configuration>
 
     <!-- ========================= -->
-    <!-- 로그 경로 -->
+    <!-- LOCAL -->
     <!-- ========================= -->
-    <property name="LOG_PATH" value="D:/STOCK_PROJECT_V2/LOCAL_STOCK_LOGS"/>
-    <property name="LOG_FILE" value="${LOG_PATH}/batch.log"/>
+    <springProfile name="local">
+        <property name="LOG_PATH" value="D:/STOCK_PROJECT_V2/LOCAL_STOCK_LOGS"/>
+    </springProfile>
+
+    <!-- ========================= -->
+    <!-- DOCKER -->
+    <!-- ========================= -->
+    <springProfile name="docker">
+        <property name="LOG_PATH" value="/logs"/>
+    </springProfile>
+
+    <property name="LOG_FILE" value="${LOG_PATH}/webpage.log"/>
 
     <!-- ========================= -->
     <!-- 콘솔 로그 -->
@@ -29,7 +39,7 @@
         <rollingPolicy
                 class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>
-                ${LOG_PATH}/batch.%d{yyyy-MM-dd}.log
+                ${LOG_PATH}/webpage.%d{yyyy-MM-dd}.log
             </fileNamePattern>
             <maxHistory>60</maxHistory>
         </rollingPolicy>
