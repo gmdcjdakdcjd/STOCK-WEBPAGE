@@ -22,4 +22,6 @@ public class StrategyDetailDTO {
     private Long volume;
     private Integer specialValue;
     private Date createdAt;
+
+    private StrategyCodeDTO strategy;
 }

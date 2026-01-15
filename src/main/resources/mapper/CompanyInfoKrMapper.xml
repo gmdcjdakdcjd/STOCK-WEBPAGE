@@ -41,8 +41,11 @@
             last_update   AS lastUpdate
         FROM company_info_kr
         WHERE
-            LOWER(name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-           OR LOWER(code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+            (
+                LOWER(name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                    OR LOWER(code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                )
+          AND stock_type = '보통주'
         ORDER BY
             CASE
                 WHEN LOWER(code) = LOWER(#{keyword}) THEN 0
@@ -52,6 +55,7 @@
             name
             LIMIT #{limit}
     </select>
+
 
 
     <!-- =====================================================

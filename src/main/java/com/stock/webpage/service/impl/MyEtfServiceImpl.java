@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -146,6 +147,7 @@ public class MyEtfServiceImpl implements MyEtfService {
     public List<MyEtfItemViewDTO> getEtfItemList(String userId, String etfName) {
 
         double usdRate = marketIndicatorProvider.getUsdRate();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         List<MyEtfItemDTO> items =
                 etfItemMapper.selectEtfItemList(userId, etfName, "N");
@@ -162,6 +164,11 @@ public class MyEtfServiceImpl implements MyEtfService {
                     .priceAtAdd(item.getPriceAtAdd())
                     .memo(item.getMemo())
                     .build();
+
+            if (item.getCreatedAt() != null) {
+                dto.setAddedDate(item.getCreatedAt().format(dateFormatter)
+                );
+            }
 
             // 기본값
             dto.setPriceAtAddDisplay("-");
@@ -197,6 +204,7 @@ public class MyEtfServiceImpl implements MyEtfService {
             dto.setCurrentPrice(current);
             dto.setEvaluatedAmount(evaluated);
             dto.setProfitRate(profitRate);
+            dto.setPriceAtAdd(add);
 
             // 화면용
             dto.setPriceAtAddDisplay(String.format("%,d", Math.round(add)));

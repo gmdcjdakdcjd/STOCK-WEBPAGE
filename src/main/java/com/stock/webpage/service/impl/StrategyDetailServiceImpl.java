@@ -1,7 +1,9 @@
 package com.stock.webpage.service.impl;
 
+import com.stock.webpage.dto.StrategyCodeDTO;
 import com.stock.webpage.dto.StrategyDetailDTO;
 import com.stock.webpage.dto.StrategyResultDTO;
+import com.stock.webpage.enums.StrategyCode;
 import com.stock.webpage.mapper.StrategyDetailMapper;
 import com.stock.webpage.mapper.StrategyResultMapper;
 import com.stock.webpage.service.StrategyDetailService;
@@ -59,8 +61,23 @@ public class StrategyDetailServiceImpl implements StrategyDetailService {
 
     @Override
     public List<StrategyDetailDTO> searchDetail(String keyword) {
-        return strategyDetailMapper.selectByKeyword(keyword);
+
+        List<StrategyDetailDTO> list =
+                strategyDetailMapper.selectByKeyword(keyword);
+
+        for (StrategyDetailDTO dto : list) {
+            StrategyCode sc = StrategyCode.findByCode(dto.getAction());
+
+            if (sc != null) {
+                dto.setStrategy(
+                        new StrategyCodeDTO(sc.getCode(), sc.getLabel())
+                );
+            }
+        }
+
+        return list;
     }
+
 
     // -----------------------------
     // 가격 포맷 처리

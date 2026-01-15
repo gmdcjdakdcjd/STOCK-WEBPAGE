@@ -18,7 +18,7 @@ public class NpsController {
     private final NpsPortfolioService portfolioService;
     private final NpsPortfolioItemService itemService;
 
-    // 📌 국민연금 요약
+    // 국민연금 요약
     @GetMapping("/nps/summary")
     public String summary(Model model) {
 
@@ -30,7 +30,7 @@ public class NpsController {
         return "nps/summary";
     }
 
-    // 📌 국민연금 보유 종목 리스트
+    // 국민연금 보유 종목 리스트
     @GetMapping("/nps/list")
     public String list(
             @RequestParam String asset,
@@ -46,7 +46,7 @@ public class NpsController {
 
         model.addAttribute("asset", asset);
         model.addAttribute("market", market);
-        model.addAttribute("q", q); // 🔍 화면 검색어 유지
+        model.addAttribute("q", q); // 화면 검색어 유지
 
         return "nps/list";
     }

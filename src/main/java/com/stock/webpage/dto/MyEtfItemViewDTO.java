@@ -28,5 +28,7 @@ public class MyEtfItemViewDTO {
     private String evaluatedAmountDisplay;
     private String profitRateDisplay;
 
+    private String addedDate;   // yyyy-MM-dd
+
     private String memo;
 }

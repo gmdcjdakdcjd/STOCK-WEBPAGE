@@ -116,6 +116,7 @@
           <th>종목코드</th>
           <th>종목명</th>
           <th>수량</th>
+          <th>편입일</th>
           <th>편입가</th>
           <th>현재가</th>
           <th>평가금액</th>
@@ -128,11 +129,12 @@
           <td th:text="${s.code}"></td>
           <td th:text="${s.name}"></td>
           <td th:text="${s.quantity}"></td>
+          <td th:text="${s.addedDate}"></td>
           <td th:text="${s.priceAtAddDisplay}"></td>
           <td th:text="${s.currentPriceDisplay}"
               th:classappend="
-        ${s.evaluatedAmount > (s.priceAtAdd * s.quantity)} ? 'text-danger fw-bold' :
-        (${s.evaluatedAmount < (s.priceAtAdd * s.quantity)} ? 'text-primary fw-bold' : 'fw-bold')
+      ${s.currentPrice > s.priceAtAdd} ? 'text-danger fw-bold' :
+      (${s.currentPrice < s.priceAtAdd} ? 'text-primary fw-bold' : 'fw-bold')
     ">
           </td>
           <td th:text="${s.evaluatedAmountDisplay}"></td>
