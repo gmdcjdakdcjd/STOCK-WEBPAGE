@@ -22,12 +22,21 @@
          ========================= -->
     <select id="selectByUserIdEtfNameRestoredYn"
             resultType="com.stock.webpage.dto.MyEtfItemHistoryDTO">
-        SELECT *
-        FROM my_etf_item_history
-        WHERE user_id = #{userId}
-          AND etf_name = #{etfName}
-          AND restored_yn = #{restoredYn}
-        ORDER BY deleted_at DESC
+        SELECT
+            h.hist_id        AS histId,
+            h.code           AS code,
+            h.name           AS name,
+            i.price_at_add   AS priceAtAdd,
+            i.created_at     AS createdAt,   -- 진짜 편입일
+            i.deleted_at     AS deletedAt,
+            i.quantity       AS quantity
+        FROM my_etf_item_history h
+                 JOIN my_etf_item i ON h.etf_item_id = i.id
+        WHERE h.user_id = #{userId}
+          AND h.etf_name = #{etfName}
+          AND h.restored_yn = #{restoredYn}
+        ORDER BY i.deleted_at DESC
+
     </select>
 
     <!-- =========================

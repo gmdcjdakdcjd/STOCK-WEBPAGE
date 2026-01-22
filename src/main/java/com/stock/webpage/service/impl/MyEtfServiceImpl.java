@@ -285,8 +285,7 @@ public class MyEtfServiceImpl implements MyEtfService {
         for (Long histId : request.getHistoryIds()) {
 
             // ✅ history → item_id 조회
-            Long itemId =
-                    historyMapper.selectItemIdByHistoryId(histId, userId);
+            Long itemId = historyMapper.selectItemIdByHistoryId(histId, userId);
 
             if (itemId == null) {
                 throw new IllegalStateException("복구 대상 item 없음. histId=" + histId);
@@ -365,5 +364,46 @@ public class MyEtfServiceImpl implements MyEtfService {
         etfItemMapper.deleteByUserIdAndEtfName(userId, etfName);
     }
 
+    @Override
+    public List<MyEtfItemHistoryDTO> getEtfItemRestoreHistory(
+            String userId,
+            String etfName
+    ) {
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<MyEtfItemHistoryDTO> list =
+                historyMapper.selectByUserIdEtfNameRestoredYn(
+                        userId,
+                        etfName,
+                        "N"
+                );
+
+        for (MyEtfItemHistoryDTO dto : list) {
+
+            // 편입일 포맷 보정
+            if (dto.getCreatedAt() != null) {
+                dto.setCreatedAtDisplay(
+                        dto.getCreatedAt().format(formatter)
+                );
+            }
+
+            // 삭제일 포맷 보정
+            if (dto.getDeletedAt() != null) {
+                dto.setDeletedAtDisplay(
+                        dto.getDeletedAt().format(formatter)
+                );
+            }
+
+            // 편입가 표시용
+            if (dto.getPriceAtAdd() != null) {
+                dto.setPriceAtAddDisplay(
+                        String.format("%,d", Math.round(dto.getPriceAtAdd()))
+                );
+            }
+        }
+
+        return list;
+    }
 
 }

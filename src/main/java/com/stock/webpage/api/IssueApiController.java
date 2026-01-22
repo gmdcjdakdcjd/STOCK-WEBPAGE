@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/issue/api")
+@RequestMapping("/api/issue")
 @RequiredArgsConstructor
 @Log4j2
 public class IssueApiController {

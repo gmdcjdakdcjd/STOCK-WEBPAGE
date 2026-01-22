@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/nps/api")
+@RequestMapping("/api/nps")
 public class NpsApiController {
 
     private final NpsPortfolioService portfolioService;

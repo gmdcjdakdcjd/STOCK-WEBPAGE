@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/myetf/api")
+@RequestMapping("/api/myetf")
 public class MyEtfApiController {
 
     private final MyEtfService myEtfService;
@@ -98,10 +98,9 @@ public class MyEtfApiController {
             @AuthenticationPrincipal User user,
             @RequestParam String etfName
     ) {
-        return historyMapper.selectByUserIdEtfNameRestoredYn(
+        return myEtfService.getEtfItemRestoreHistory(
                 user.getUsername(),
-                etfName,
-                "N"
+                etfName
         );
     }
 

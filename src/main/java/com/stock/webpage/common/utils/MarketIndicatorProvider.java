@@ -1,6 +1,6 @@
 package com.stock.webpage.common.utils;
 
-import com.stock.webpage.mapper.MarketIndicatorMapper;
+import com.stock.webpage.mapper.ExchangeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MarketIndicatorProvider {
 
-    private final MarketIndicatorMapper marketIndicatorMapper;
+    private final ExchangeMapper exchangeMapper;
 
     public double getUsdRate() {
 
-        Double rate = marketIndicatorMapper.selectLatestCloseByCode("usd");
+        Double rate = exchangeMapper.selectLatestCloseByCode("USDKRW");
 
         if (rate == null) {
             throw new IllegalStateException("USD 환율 정보 없음");

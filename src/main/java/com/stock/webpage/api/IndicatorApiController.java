@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/indicator/api")
+@RequestMapping("/api/indicator")
 @RequiredArgsConstructor
 @Log4j2
 public class IndicatorApiController {

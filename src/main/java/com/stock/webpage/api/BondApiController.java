@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/bond/api")
+@RequestMapping("/api/bond")
 @RequiredArgsConstructor
 @Log4j2
 public class BondApiController {

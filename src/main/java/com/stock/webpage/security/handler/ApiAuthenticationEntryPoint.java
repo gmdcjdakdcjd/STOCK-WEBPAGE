@@ -17,26 +17,16 @@ public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
-        log.info("-------- API UNAUTHORIZED --------");
-
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType("application/json;charset=UTF-8");
 
-        String accept = request.getHeader("Accept");
-        boolean jsonRequest =
-                accept != null && accept.contains("application/json");
-
-        if (jsonRequest) {
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("""
-                {
-                  "status": 401,
-                  "error": "UNAUTHORIZED",
-                  "message": "LOGIN REQUIRED"
-                }
-            """);
-        } else {
-            // 혹시 API 아닌 요청이 섞였을 때 안전장치
-            response.sendRedirect("/member/login");
+        response.getWriter().write("""
+        {
+          "status": 401,
+          "error": "UNAUTHORIZED",
+          "message": "LOGIN REQUIRED"
         }
+    """);
     }
+
 }

@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/kodex/api")
+@RequestMapping("/api/kodex")
 public class KodexEtfApiController {
 
     private final KodexEtfSummaryService kodexEtfSummaryService;

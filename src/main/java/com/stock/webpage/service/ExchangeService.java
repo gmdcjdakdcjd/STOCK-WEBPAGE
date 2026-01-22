@@ -1,0 +1,10 @@
+package com.stock.webpage.service;
+
+import com.stock.webpage.dto.MarketIndicatorDTO;
+
+import java.util.List;
+
+public interface ExchangeService {
+
+    List<MarketIndicatorDTO> getIndicator(String code);
+}

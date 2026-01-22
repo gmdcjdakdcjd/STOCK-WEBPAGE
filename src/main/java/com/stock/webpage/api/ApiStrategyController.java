@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Log4j2
 @RestController
-@RequestMapping("/result/api")
+@RequestMapping("/api/result")
 @RequiredArgsConstructor
 public class ApiStrategyController {
 

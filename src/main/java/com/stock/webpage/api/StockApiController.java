@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/stock/api")
+@RequestMapping("/api/stock")
 @Log4j2
 @RequiredArgsConstructor
 public class StockApiController {

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/dual-momentum/api")
+@RequestMapping("/api/dual-momentum")
 @RequiredArgsConstructor
 @Log4j2
 public class DualMomentumApiController {

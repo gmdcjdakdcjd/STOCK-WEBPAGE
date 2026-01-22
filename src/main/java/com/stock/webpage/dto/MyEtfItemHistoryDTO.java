@@ -32,4 +32,11 @@ public class MyEtfItemHistoryDTO {
 
     private String restoredYn;
     private LocalDateTime restoredAt;
+
+    /* =========================
+   View 전용 필드 (⭐ 추가)
+   ========================= */
+    private String createdAtDisplay;    // 편입일
+    private String deletedAtDisplay;    // 삭제일
+    private String priceAtAddDisplay;   // 편입가
 }

@@ -34,5 +34,9 @@ public interface MyEtfService {
     // ETF 삭제
     void deleteEtf(String userId, String etfName);
 
-
+    // ⭐ ETF 종목 복구 이력 조회 (추가)
+    List<MyEtfItemHistoryDTO> getEtfItemRestoreHistory(
+            String userId,
+            String etfName
+    );
 }
