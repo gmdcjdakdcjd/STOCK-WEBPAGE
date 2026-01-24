@@ -26,7 +26,7 @@ public class MemberServiceImpl implements MemberService {
     public void join(MemberJoinDTO dto)
             throws MidExistException, EmailExistException {
 
-        // ✅ Service 메서드 재사용 (정석)
+        // Service 메서드 재사용 (정석)
         if (!isMidAvailable(dto.getMid())) {
             throw new MidExistException();
         }

@@ -20,7 +20,7 @@ public class KodexEtfApiController {
     private final KodexEtfSummaryService kodexEtfSummaryService;
     private final KodexEtfHoldingsService kodexEtfHoldingsService;
 
-    // 🔹 KODEX ETF 요약 (React)
+    // KODEX ETF 요약 (React)
     @GetMapping("/summary")
     public List<KodexEtfSummaryDTO> summary(
             @RequestParam(required = false) String q
@@ -30,7 +30,7 @@ public class KodexEtfApiController {
                 : kodexEtfSummaryService.search(q);
     }
 
-    // 🔹 ETF 구성 종목 (React)
+    // ETF 구성 종목 (React)
     @GetMapping("/holdings")
     public List<KodexEtfHoldingsDTO> holdings(
             @RequestParam String etfId

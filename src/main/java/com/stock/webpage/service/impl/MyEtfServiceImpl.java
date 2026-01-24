@@ -34,17 +34,17 @@ public class MyEtfServiceImpl implements MyEtfService {
             PageRequestDTO pageRequestDTO
     ) {
 
-        // 1️⃣ 전체 ETF 개수 (페이징용)
+        // 전체 ETF 개수 (페이징용)
         int total = etfItemMapper.countMyEtf(userId);
 
-        // 2️⃣ 페이징된 ETF 요약 목록
+        // 페이징된 ETF 요약 목록
         List<Map<String, Object>> rows =
                 etfItemMapper.selectMyEtfSummaryPaging(userId, pageRequestDTO);
 
         double usdRate = marketIndicatorProvider.getUsdRate();
         List<MyEtfSummaryDTO> dtoList = new ArrayList<>();
 
-        // 3️⃣ 기존 계산 로직 그대로 유지
+        // 기존 계산 로직 그대로 유지
         for (Map<String, Object> r : rows) {
 
             String etfName = (String) r.get("etfName");
@@ -89,7 +89,7 @@ public class MyEtfServiceImpl implements MyEtfService {
             );
         }
 
-        // 4️⃣ PageResponseDTO로 감싸서 반환
+        // PageResponseDTO로 감싸서 반환
         return PageResponseDTO.<MyEtfSummaryDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
@@ -103,7 +103,7 @@ public class MyEtfServiceImpl implements MyEtfService {
     @Override
     public void createEtf(String userId, MyEtfCreateRequestDTO request) {
 
-        // ✅ 1. ETF 이름 중복 체크
+        // 1. ETF 이름 중복 체크
         int count = etfItemMapper.countByUserIdAndEtfName(
                 userId,
                 request.getEtfName()
@@ -113,7 +113,7 @@ public class MyEtfServiceImpl implements MyEtfService {
             throw new IllegalStateException("이미 존재하는 ETF 이름입니다.");
         }
 
-        // ✅ 2. 정상 생성
+        // 2. 정상 생성
         for (MyEtfItemRequestDTO item : request.getItems()) {
 
             StockDTO stock = stockViewService.getStockInfo(null, item.getCode());
@@ -284,17 +284,17 @@ public class MyEtfServiceImpl implements MyEtfService {
 
         for (Long histId : request.getHistoryIds()) {
 
-            // ✅ history → item_id 조회
+            // history → item_id 조회
             Long itemId = historyMapper.selectItemIdByHistoryId(histId, userId);
 
             if (itemId == null) {
                 throw new IllegalStateException("복구 대상 item 없음. histId=" + histId);
             }
 
-            // ✅ item 복구 (Y → N)
+            // item 복구 (Y → N)
             etfItemMapper.restoreById(itemId, userId);
 
-            // ✅ history 복구 처리
+            // history 복구 처리
             historyMapper.markRestoredById(histId, userId);
         }
     }
@@ -357,10 +357,10 @@ public class MyEtfServiceImpl implements MyEtfService {
     @Transactional
     public void deleteEtf(String userId, String etfName) {
 
-        // 1️⃣ history 먼저 삭제
+        // history 먼저 삭제
         historyMapper.deleteByUserIdAndEtfName(userId, etfName);
 
-        // 2️⃣ item 삭제
+        // item 삭제
         etfItemMapper.deleteByUserIdAndEtfName(userId, etfName);
     }
 

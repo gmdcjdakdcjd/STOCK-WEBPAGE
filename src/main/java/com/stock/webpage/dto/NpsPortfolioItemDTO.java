@@ -48,7 +48,7 @@ public class NpsPortfolioItemDTO {
     private LocalDateTime collectedAt;
 
     /* =========================
-   🔽 화면 표시용 필드
+   화면 표시용 필드
    ========================= */
 
     /** 평가액 표시용 (억, 콤마, 소수점 제거) */

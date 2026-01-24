@@ -19,7 +19,7 @@
         AND asset_type = #{asset}
         AND market = #{market}
 
-        <!-- 🔍 검색 -->
+        <!-- 검색 -->
         <if test="q != null and q != ''">
             AND name LIKE CONCAT('%', #{q}, '%')
         </if>

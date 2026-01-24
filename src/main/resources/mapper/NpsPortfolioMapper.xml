@@ -14,11 +14,11 @@
             market,
             total_count      AS totalCount,
             collected_at     AS collectedAt
-        FROM nps_portfolio
+        FROM nps_portfolio_header
         WHERE institution_code = #{institutionCode}
           AND base_date = (
             SELECT MAX(base_date)
-            FROM nps_portfolio
+            FROM nps_portfolio_header
             WHERE institution_code = #{institutionCode}
         )
         ORDER BY asset_type, market

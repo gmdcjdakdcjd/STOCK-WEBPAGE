@@ -19,7 +19,7 @@ public interface MyEtfItemMapper {
     );
 
     /* =========================
-       ✅ ETF 요약 (페이징)
+       ETF 요약 (페이징)
        ========================= */
     List<Map<String, Object>> selectMyEtfSummaryPaging(
             @Param("userId") String userId,
@@ -27,7 +27,7 @@ public interface MyEtfItemMapper {
     );
 
     /* =========================
-       ✅ ETF 개수 (페이징용)
+       ETF 개수 (페이징용)
        ========================= */
     int countMyEtf(
             @Param("userId") String userId

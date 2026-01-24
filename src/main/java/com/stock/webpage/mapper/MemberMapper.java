@@ -16,7 +16,7 @@ public interface MemberMapper {
 
     MemberDTO selectMemberByEmail(@Param("email") String email);
 
-    // ✅ ID 또는 EMAIL 로그인용 (추가)
+    // ID 또는 EMAIL 로그인용 (추가)
     MemberDTO selectMemberByMidOrEmail(@Param("keyword") String keyword);
 
     /* =========================

@@ -34,7 +34,7 @@ public class MyEtfItemHistoryDTO {
     private LocalDateTime restoredAt;
 
     /* =========================
-   View 전용 필드 (⭐ 추가)
+   View 전용 필드
    ========================= */
     private String createdAtDisplay;    // 편입일
     private String deletedAtDisplay;    // 삭제일

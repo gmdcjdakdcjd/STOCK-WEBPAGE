@@ -24,12 +24,12 @@ public class ManageBatchHistoryService {
             PageRequestDTO pageRequestDTO
     ) {
 
-        // 1️⃣ IN + OUT 이력 수집
+        // IN + OUT 이력 수집
         List<BatchHistoryView> all = new ArrayList<>();
         all.addAll(inService.getAllOrderByExecStartTimeDesc());
         all.addAll(outService.getAllOrderByExecStartTimeDesc());
 
-        // 2️⃣ 날짜 기준 그룹화 + 정렬
+        // 날짜 기준 그룹화 + 정렬
         List<BatchDateGroupDTO> grouped = all.stream()
                 .collect(Collectors.groupingBy(BatchHistoryView::getExecDate))
                 .entrySet().stream()
@@ -44,7 +44,7 @@ public class ManageBatchHistoryService {
                 ))
                 .toList();
 
-        // 3️⃣ 🔥 여기서 페이징
+        // 여기서 페이징
         int total = grouped.size();
         int start = pageRequestDTO.getOffset();
         int end = Math.min(start + pageRequestDTO.getSize(), total);
@@ -52,7 +52,7 @@ public class ManageBatchHistoryService {
         List<BatchDateGroupDTO> pageList =
                 start >= total ? List.of() : grouped.subList(start, end);
 
-        // 4️⃣ PageResponseDTO 반환
+        // PageResponseDTO 반환
         return PageResponseDTO.<BatchDateGroupDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(pageList)

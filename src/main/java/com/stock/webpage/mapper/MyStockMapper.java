@@ -14,7 +14,7 @@ public interface MyStockMapper {
     // 조회
     // =========================
 
-    // 🔹 기존: 전체 목록 (유지 – 다른 곳에서 쓰고 있음)
+    // 기존: 전체 목록 (유지 – 다른 곳에서 쓰고 있음)
     List<MyStockDTO> selectMyStockList(String userId);
 
     List<MyStockDTO> selectMyStockListPagingKR(@Param("userId") String userId, @Param("page") PageRequestDTO page);

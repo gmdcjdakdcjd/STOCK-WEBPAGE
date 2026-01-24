@@ -53,22 +53,22 @@ public class StrategyResultServiceImpl implements StrategyResultService {
             String market
     ) {
 
-        // 1️⃣ 마켓별 전략 코드 목록
+        // 마켓별 전략 코드 목록
         List<String> strategies =
                 Arrays.stream(StrategyCode.values())
                         .filter(s -> s.getMarket().equals(market))
                         .map(StrategyCode::getCode)
                         .toList();
 
-        // 2️⃣ 전략명 정규화 (빈 문자열 → null)
+        // 전략명 정규화 (빈 문자열 → null)
         String normalizedStrategy =
                 (strategy != null && !strategy.isBlank()) ? strategy : null;
 
-        // 3️⃣ 페이징 계산 (⚠️ 핵심)
+        // 페이징 계산
         int offset = (dto.getPage() - 1) * dto.getSize();
         int limit = dto.getSize();
 
-        // 4️⃣ 리스트 조회
+        // 리스트 조회
         List<StrategyResultDTO> list =
                 strategyResultMapper.selectStrategyResults(
                         strategies,
@@ -79,7 +79,7 @@ public class StrategyResultServiceImpl implements StrategyResultService {
                         limit
                 );
 
-        // 5️⃣ 전체 건수 조회
+        // 전체 건수 조회
         int total =
                 strategyResultMapper.countStrategyResults(
                         strategies,
@@ -88,7 +88,7 @@ public class StrategyResultServiceImpl implements StrategyResultService {
                         "_" + market
                 );
 
-        // 6️⃣ PageResponseDTO 생성
+        // PageResponseDTO 생성
         return PageResponseDTO.<StrategyResultDTO>withAll()
                 .pageRequestDTO(dto)
                 .dtoList(list)

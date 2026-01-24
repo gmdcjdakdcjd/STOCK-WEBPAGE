@@ -24,7 +24,7 @@ public class StockViewServiceImpl implements StockViewService {
         CompanyInfoUsDTO us = null;
 
         // =========================
-        // 1️⃣ 종목 기본 정보 조회
+        // 종목 기본 정보 조회
         // =========================
         if (stockCode != null && !stockCode.isBlank()) {
             if (stockCode.matches("\\d+")) {
@@ -47,7 +47,7 @@ public class StockViewServiceImpl implements StockViewService {
         }
 
         // =========================
-        // 2️⃣ 한국 주식
+        // 한국 주식
         // =========================
         if (kr != null) {
             List<PriceDTO> prices =
@@ -73,7 +73,7 @@ public class StockViewServiceImpl implements StockViewService {
         }
 
         // =========================
-        // 3️⃣ 미국 주식
+        // 미국 주식
         // =========================
         List<PriceDTO> prices =
                 dailyPriceUsMapper.selectByCodeOrderByDateDesc(us.getCode())

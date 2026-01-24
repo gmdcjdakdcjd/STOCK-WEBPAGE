@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("loadUserByUsername: {}", username);
 
         /* =========================
-           1️⃣ 회원 조회 (ID or EMAIL)
+           회원 조회 (ID or EMAIL)
            ========================= */
         MemberDTO member =
                 memberService.getMemberByMidOrEmail(username);
@@ -37,7 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         /* =========================
-           2️⃣ 로그인 정책 체크
+           로그인 정책 체크
            ========================= */
         if (member.isDel()) {
             throw new UsernameNotFoundException("Deleted user");
@@ -48,7 +48,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         /* =========================
-           3️⃣ 권한 조회 (MID 기준)
+           권한 조회 (MID 기준)
            ========================= */
         List<SimpleGrantedAuthority> authorities =
                 memberService.getRolesByMid(member.getMid())
@@ -57,7 +57,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                         .toList();
 
         /* =========================
-           4️⃣ Security DTO 생성
+           Security DTO 생성
            ========================= */
         MemberSecurityDTO securityDTO =
                 new MemberSecurityDTO(

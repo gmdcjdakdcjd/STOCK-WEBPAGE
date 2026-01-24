@@ -32,7 +32,7 @@ public class NpsPortfolioItemServiceImpl
                         q
                 );
 
-        // 🔥 여기서 화면용 값 세팅
+        // 여기서 화면용 값 세팅
         list.forEach(dto -> {
             if (dto.getEvalAmount100m() != null) {
                 dto.setEvalAmountDisplay(

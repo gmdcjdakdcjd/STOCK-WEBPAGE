@@ -33,7 +33,7 @@
         WHERE email = #{email}
     </select>
 
-    <!-- ✅ MID 또는 EMAIL 조회 (로그인용) -->
+    <!-- MID 또는 EMAIL 조회 (로그인용) -->
     <select id="selectMemberByMidOrEmail"
             parameterType="string"
             resultType="MemberDto">

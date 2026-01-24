@@ -18,13 +18,13 @@ public class NpsApiController {
     private final NpsPortfolioService portfolioService;
     private final NpsPortfolioItemService itemService;
 
-    // 🔹 요약 (React)
+    // 요약 (React)
     @GetMapping("/summary")
     public Object summary() {
         return portfolioService.getLatestSummary("NPS");
     }
 
-    // 🔹 보유 종목 리스트 (React)
+    // 보유 종목 리스트 (React)
     @GetMapping("/list")
     public Object list(
             @RequestParam String asset,
@@ -34,7 +34,7 @@ public class NpsApiController {
         return itemService.getItemList("NPS", asset, market, q);
     }
 
-    // 🔹 자동완성 (React)
+    // 자동완성 (React)
     @GetMapping("/autocomplete")
     public List<String> autocomplete(
             @RequestParam String asset,

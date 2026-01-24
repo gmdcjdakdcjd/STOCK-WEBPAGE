@@ -28,20 +28,20 @@ public class ApiSecurityConfig {
         log.info("------------ API security configure ----------------");
 
         http
-                // ✅ API 요청만 이 체인이 처리
+                // API 요청만 이 체인이 처리
                 .securityMatcher("/api/**")
 
-                // ✅ CSRF 비활성 (SPA + fetch 기준)
+                // CSRF 비활성 (SPA + fetch 기준)
                 .csrf(csrf -> csrf.disable())
 
-                // ✅ 세션 기반 인증 유지
+                // 세션 기반 인증 유지
                 .sessionManagement(session -> session
                         .sessionFixation().migrateSession()
                 )
 
-                // ✅ API 접근 권한
+                // API 접근 권한
                 .authorizeHttpRequests(auth -> auth
-                        // 🔓 인증 없이 접근 가능 (공개 조회)
+                        // 인증 없이 접근 가능 (공개 조회)
                         .requestMatchers(
                                 "/api/auth/**",
 
@@ -59,7 +59,7 @@ public class ApiSecurityConfig {
                                 "/api/stockIndex"
                         ).permitAll()
 
-                        // 🔐 로그인 필요 (개인화 데이터)
+                        // 로그인 필요 (개인화 데이터)
                         .requestMatchers(
                                 "/api/mystock/**",
                                 "/api/myetf/**",
@@ -71,7 +71,7 @@ public class ApiSecurityConfig {
                 )
 
 
-                // ✅ API 로그인 (JSON 응답)
+                // API 로그인 (JSON 응답)
                 .formLogin(login -> login
                         .loginProcessingUrl("/api/auth/login")
                         .successHandler((request, response, authentication) -> {
@@ -95,7 +95,7 @@ public class ApiSecurityConfig {
                         })
                 )
 
-                // ✅ 로그아웃 (리다이렉트 없음, SPA에서 처리)
+                // 로그아웃 (리다이렉트 없음, SPA에서 처리)
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
@@ -112,13 +112,13 @@ public class ApiSecurityConfig {
                 )
 
 
-                // ✅ 인증/권한 예외는 JSON으로만 처리
+                // 인증/권한 예외는 JSON으로만 처리
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new ApiAuthenticationEntryPoint())
                         .accessDeniedHandler(new ApiAccessDeniedHandler())
                 )
 
-                // ✅ 사용자 조회 서비스
+                // 사용자 조회 서비스
                 .userDetailsService(userDetailsService);
 
         return http.build();

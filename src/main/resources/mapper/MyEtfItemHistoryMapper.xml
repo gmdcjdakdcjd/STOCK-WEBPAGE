@@ -91,7 +91,7 @@
     </update>
 
     <!-- =========================
-         ⭐ item → history 백업 (핵심)
+         item → history 백업 (핵심)
          ========================= -->
     <insert id="backupHistoryFromItem">
         INSERT INTO my_etf_item_history (

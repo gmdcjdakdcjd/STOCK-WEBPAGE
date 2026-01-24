@@ -16,7 +16,7 @@ public interface MyEtfService {
     // ETF 생성
     void createEtf(String userId, MyEtfCreateRequestDTO request);
 
-    // ETF 상세 종목 (⭐ View DTO로 변경)
+    // ETF 상세 종목 (View DTO로 변경)
     List<MyEtfItemViewDTO> getEtfItemList(String userId, String etfName);
 
     // ETF 설명 조회
@@ -34,7 +34,7 @@ public interface MyEtfService {
     // ETF 삭제
     void deleteEtf(String userId, String etfName);
 
-    // ⭐ ETF 종목 복구 이력 조회 (추가)
+    // ETF 종목 복구 이력 조회 (추가)
     List<MyEtfItemHistoryDTO> getEtfItemRestoreHistory(
             String userId,
             String etfName

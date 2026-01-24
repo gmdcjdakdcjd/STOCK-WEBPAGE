@@ -33,12 +33,12 @@ public class StockApiController {
             @RequestParam(required = false) String stockCode
     ) {
 
-        log.info("🔍 종목 검색 요청: stockName={}, stockCode={}", stockName, stockCode);
+        log.info("종목 검색 요청: stockName={}, stockCode={}", stockName, stockCode);
 
         Map<String, Object> result = new HashMap<>();
 
         /* ==========================
-           1️⃣ 입력값 검증
+           입력값 검증
            ========================== */
         if ((stockName == null || stockName.isBlank())
                 && (stockCode == null || stockCode.isBlank())) {
@@ -56,7 +56,7 @@ public class StockApiController {
                         : stockCode;
 
         /* ==========================
-           2️⃣ 전략 포착 이력
+           전략 포착 이력
            ========================== */
         result.put(
                 "signalList",
@@ -64,12 +64,12 @@ public class StockApiController {
         );
 
         /* ==========================
-           3️⃣ 종목 정보
+           종목 정보
            ========================== */
         StockDTO stockInfo =
                 stockService.getStockInfo(stockName, stockCode);
 
-        log.info("✅ stockInfo 결과: {}", stockInfo);
+        log.info("stockInfo 결과: {}", stockInfo);
 
         if (stockInfo == null) {
             result.put("error", "해당 종목 정보를 찾을 수 없습니다.");
@@ -81,7 +81,7 @@ public class StockApiController {
         result.put("stock", stockInfo);
 
         /* ==========================
-           4️⃣ 가격 데이터 가공
+           가격 데이터 가공
            (표 + 차트 공용)
            ========================== */
         boolean isKR =
