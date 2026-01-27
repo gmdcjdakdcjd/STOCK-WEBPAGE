@@ -31,26 +31,40 @@
             resultType="com.stock.webpage.dto.CompanyInfoUsDTO">
 
         SELECT
-            code,
-            name,
-            sector,
-            industry,
-            market,
-            cik,
-            last_update AS lastUpdate
-        FROM company_info_us
+            c.code,
+            c.name,
+            c.sector,
+            c.industry,
+            c.market,
+            c.cik,
+            c.last_update AS lastUpdate,
+            p.close       AS price
+        FROM company_info_us c
+                 LEFT JOIN (
+            SELECT
+                d.code,
+                d.close
+            FROM daily_price_us d
+            WHERE d.date = (
+                SELECT MAX(date)
+                FROM daily_price_us
+                WHERE code = d.code
+            )
+        ) p ON c.code = p.code
         WHERE
-            LOWER(name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-           OR LOWER(code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+            LOWER(c.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+           OR LOWER(c.code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
         ORDER BY
             CASE
-                WHEN LOWER(code) = LOWER(#{keyword}) THEN 0
-                WHEN LOWER(name) = LOWER(#{keyword}) THEN 1
+                WHEN LOWER(c.code) = LOWER(#{keyword}) THEN 0
+                WHEN LOWER(c.name) = LOWER(#{keyword}) THEN 1
                 ELSE 2
                 END,
-            name
+            c.name
             LIMIT #{limit}
+
     </select>
+
 
     <!-- =====================================================
          코드 단건 조회 (상세 화면용)

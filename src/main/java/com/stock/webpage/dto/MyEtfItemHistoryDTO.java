@@ -39,4 +39,6 @@ public class MyEtfItemHistoryDTO {
     private String createdAtDisplay;    // 편입일
     private String deletedAtDisplay;    // 삭제일
     private String priceAtAddDisplay;   // 편입가
+
+    private String market; // "KR" | "US"
 }

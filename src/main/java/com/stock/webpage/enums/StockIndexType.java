@@ -13,5 +13,6 @@ public enum StockIndexType {
     SHS,
     STX,
     TWS,
-    XTR
+    XTR,
+    SPI
 }

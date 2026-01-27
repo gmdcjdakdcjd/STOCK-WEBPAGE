@@ -90,6 +90,11 @@ public class ApiStockIndexController {
                         stockIndexService.getIndicator(StockIndexType.XTR.name())
                 ));
 
+        result.put("snp500",
+                IndicatorChartConverter.convert(
+                        stockIndexService.getIndicator(StockIndexType.SPI.name())
+                ));
+
         log.info("StockIndex API called");
 
         return result;

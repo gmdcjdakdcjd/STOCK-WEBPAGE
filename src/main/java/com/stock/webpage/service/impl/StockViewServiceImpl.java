@@ -27,20 +27,33 @@ public class StockViewServiceImpl implements StockViewService {
         // 종목 기본 정보 조회
         // =========================
         if (stockCode != null && !stockCode.isBlank()) {
-            if (stockCode.matches("\\d+")) {
-                kr = companyInfoKrMapper.selectByCode(stockCode);
+
+            CompanyInfoKrDTO krTmp =
+                    companyInfoKrMapper.selectByCode(stockCode);
+
+            if (krTmp != null) {
+                kr = krTmp;
             } else {
                 us = companyInfoUsMapper.selectByCode(stockCode);
             }
+
         } else if (stockName != null && !stockName.isBlank()) {
+
             List<CompanyInfoKrDTO> krList =
                     companyInfoKrMapper.selectTopByNameOrCodeContaining(stockName, 1);
-            List<CompanyInfoUsDTO> usList =
-                    companyInfoUsMapper.selectTopByNameOrCodeContaining(stockName, 1);
 
-            if (!krList.isEmpty()) kr = krList.get(0);
-            else if (!usList.isEmpty()) us = usList.get(0);
+            if (!krList.isEmpty()) {
+                kr = krList.get(0);
+            } else {
+                List<CompanyInfoUsDTO> usList =
+                        companyInfoUsMapper.selectTopByNameOrCodeContaining(stockName, 1);
+
+                if (!usList.isEmpty()) {
+                    us = usList.get(0);
+                }
+            }
         }
+
 
         if (kr == null && us == null) {
             return null;

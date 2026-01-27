@@ -19,4 +19,6 @@ public class CompanyInfoUsDTO implements CompanyInfoDTO {
 
     private Long cik;
     private LocalDate lastUpdate;
+
+    private Double price;
 }

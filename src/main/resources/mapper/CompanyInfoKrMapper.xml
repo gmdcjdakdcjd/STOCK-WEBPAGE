@@ -32,29 +32,43 @@
             resultType="com.stock.webpage.dto.CompanyInfoKrDTO">
 
         SELECT
-            code,
-            name,
-            market_type   AS marketType,
-            security_type AS securityType,
-            stock_type    AS stockType,
-            std_code      AS stdCode,
-            last_update   AS lastUpdate
-        FROM company_info_kr
+            c.code,
+            c.name,
+            c.market_type   AS marketType,
+            c.security_type AS securityType,
+            c.stock_type    AS stockType,
+            c.std_code      AS stdCode,
+            c.last_update   AS lastUpdate,
+            p.close   AS price
+        FROM company_info_kr c
+                 LEFT JOIN (
+            SELECT
+                code,
+                close
+            FROM daily_price_kr d
+            WHERE d.date = (
+                SELECT MAX(date)
+                FROM daily_price_kr
+                WHERE code = d.code
+            )
+        ) p ON c.code = p.code
         WHERE
             (
-                LOWER(name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-                    OR LOWER(code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                LOWER(c.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                    OR LOWER(c.code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
                 )
-          AND stock_type = '보통주'
+          AND c.stock_type = '보통주'
         ORDER BY
             CASE
-                WHEN LOWER(code) = LOWER(#{keyword}) THEN 0
-                WHEN LOWER(name) = LOWER(#{keyword}) THEN 1
+                WHEN LOWER(c.code) = LOWER(#{keyword}) THEN 0
+                WHEN LOWER(c.name) = LOWER(#{keyword}) THEN 1
                 ELSE 2
                 END,
-            name
+            c.name
             LIMIT #{limit}
+
     </select>
+
 
 
 

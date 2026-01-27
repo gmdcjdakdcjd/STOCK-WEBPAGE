@@ -14,4 +14,6 @@ public class CompanyInfoKrDTO implements CompanyInfoDTO{
     private String stockType;     // 주식 유형
     private String stdCode;       // 표준코드
     private LocalDate lastUpdate; // 마지막 업데이트
+
+    private Double price;
 }

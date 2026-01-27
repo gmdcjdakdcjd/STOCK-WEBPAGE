@@ -12,6 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+
 @Service
 @RequiredArgsConstructor
 public class AutocompleteServiceImpl implements AutocompleteService {
@@ -20,6 +26,30 @@ public class AutocompleteServiceImpl implements AutocompleteService {
 
     private final CompanyInfoKrMapper companyInfoKrMapper;
     private final CompanyInfoUsMapper companyInfoUsMapper;
+
+    private String formatPrice(Number price, String market) {
+        if (price == null) {
+            return "US".equals(market) ? "$0.00" : "0원";
+        }
+
+        BigDecimal bd = new BigDecimal(price.toString());
+
+        if ("US".equals(market)) {
+            // 달러, 소수 2자리
+            NumberFormat usFormat = NumberFormat.getCurrencyInstance(Locale.US);
+            return usFormat.format(
+                    bd.setScale(2, RoundingMode.HALF_UP)
+            );
+        }
+
+        // KR: 콤마 + 원
+        NumberFormat krFormat = NumberFormat.getNumberInstance(Locale.KOREA);
+        return krFormat.format(
+                bd.setScale(0, RoundingMode.DOWN)
+        ) + "원";
+    }
+
+
 
     @Override
     public List<Map<String, String>> search(String keyword) {
@@ -38,9 +68,11 @@ public class AutocompleteServiceImpl implements AutocompleteService {
             result.add(Map.of(
                     "code", c.getCode(),
                     "name", c.getName(),
-                    "market", "KR"
+                    "market", "KR",
+                    "price", formatPrice(c.getPrice(), "KR")
             ));
         }
+
 
         // 🇺🇸 US
         List<CompanyInfoUsDTO> usList =
@@ -50,10 +82,14 @@ public class AutocompleteServiceImpl implements AutocompleteService {
             result.add(Map.of(
                     "code", c.getCode(),
                     "name", c.getName(),
-                    "market", "US"
+                    "market", "US",
+                    "price", formatPrice(c.getPrice(), "US")
             ));
         }
 
+
         return result;
     }
+
+
 }

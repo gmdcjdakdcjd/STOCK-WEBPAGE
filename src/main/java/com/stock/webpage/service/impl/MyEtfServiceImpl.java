@@ -2,6 +2,8 @@ package com.stock.webpage.service.impl;
 
 import com.stock.webpage.common.utils.MarketIndicatorProvider;
 import com.stock.webpage.dto.*;
+import com.stock.webpage.mapper.CompanyInfoKrMapper;
+import com.stock.webpage.mapper.CompanyInfoUsMapper;
 import com.stock.webpage.mapper.MyEtfItemHistoryMapper;
 import com.stock.webpage.mapper.MyEtfItemMapper;
 import com.stock.webpage.service.MyEtfService;
@@ -24,6 +26,8 @@ public class MyEtfServiceImpl implements MyEtfService {
     private final MyEtfItemHistoryMapper historyMapper;
     private final StockViewService stockViewService;
     private final MarketIndicatorProvider marketIndicatorProvider;
+    private final CompanyInfoKrMapper companyInfoKrMapper;
+    private final CompanyInfoUsMapper companyInfoUsMapper;
 
     // =========================
     // ETF 목록 요약
@@ -140,8 +144,8 @@ public class MyEtfServiceImpl implements MyEtfService {
 
 
     // =========================
-    // ETF 상세 종목
-    // =========================
+// ETF 상세 종목
+// =========================
     @Override
     @Transactional(readOnly = true)
     public List<MyEtfItemViewDTO> getEtfItemList(String userId, String etfName) {
@@ -161,16 +165,17 @@ public class MyEtfServiceImpl implements MyEtfService {
                     .code(item.getCode())
                     .name(item.getName())
                     .quantity(item.getQuantity())
-                    .priceAtAdd(item.getPriceAtAdd())
+                    .priceAtAdd(item.getPriceAtAdd()) // 원본값 (KR: KRW / US: USD)
                     .memo(item.getMemo())
                     .build();
 
             if (item.getCreatedAt() != null) {
-                dto.setAddedDate(item.getCreatedAt().format(dateFormatter)
-                );
+                dto.setAddedDate(item.getCreatedAt().format(dateFormatter));
             }
 
+            // =========================
             // 기본값
+            // =========================
             dto.setPriceAtAddDisplay("-");
             dto.setCurrentPriceDisplay("-");
             dto.setEvaluatedAmountDisplay("-");
@@ -182,33 +187,48 @@ public class MyEtfServiceImpl implements MyEtfService {
                 continue;
             }
 
-            boolean isUsStock =
-                    item.getCode() != null &&
-                            item.getCode().matches(".*[A-Za-z].*");
+            // =========================
+            // 시장 구분
+            // =========================
+            boolean isUsStock = isUsStock(item.getCode());
 
-            double priceAtAdd = item.getPriceAtAdd();
-            double currentPrice = stock.getPriceList().get(0).getClose();
+            dto.setMarket(isUsStock ? "US" : "KR");
 
-            double add = isUsStock ? priceAtAdd * usdRate : priceAtAdd;
-            double current = isUsStock ? currentPrice * usdRate : currentPrice;
+            // =========================
+            // 원본 가격 (절대 환전하지 않음)
+            // =========================
+            double priceAtAddRaw = item.getPriceAtAdd();                  // KR: KRW / US: USD
+            double currentPriceRaw = stock.getPriceList().get(0).getClose();
 
-            double invested = add * item.getQuantity();
-            double evaluated = current * item.getQuantity();
+            dto.setPriceAtAdd(priceAtAddRaw);
+            dto.setCurrentPrice(currentPriceRaw);
+
+            // =========================
+            // KRW 환산 (계산/표시 전용)
+            // =========================
+            double addKrw     = isUsStock ? priceAtAddRaw * usdRate : priceAtAddRaw;
+            double currentKrw = isUsStock ? currentPriceRaw * usdRate : currentPriceRaw;
+
+            double invested  = addKrw * item.getQuantity();
+            double evaluated = currentKrw * item.getQuantity();
 
             double profitRate =
                     invested > 0
                             ? ((evaluated - invested) * 100.0) / invested
                             : 0.0;
 
-            // 계산용
-            dto.setCurrentPrice(current);
-            dto.setEvaluatedAmount(evaluated);
+            // =========================
+            // 계산 결과
+            // =========================
             dto.setProfitRate(profitRate);
-            dto.setPriceAtAdd(add);
+            // 필요하면 숫자 계산용으로 사용 가능
+            // dto.setEvaluatedAmount(evaluated);
 
-            // 화면용
-            dto.setPriceAtAddDisplay(String.format("%,d", Math.round(add)));
-            dto.setCurrentPriceDisplay(String.format("%,d", Math.round(current)));
+            // =========================
+            // 화면 표시용 (KRW)
+            // =========================
+            dto.setPriceAtAddDisplay(String.format("%,d", Math.round(addKrw)));
+            dto.setCurrentPriceDisplay(String.format("%,d", Math.round(currentKrw)));
             dto.setEvaluatedAmountDisplay(String.format("%,d", Math.round(evaluated)));
             dto.setProfitRateDisplay(String.format("%.2f%%", profitRate));
 
@@ -318,9 +338,8 @@ public class MyEtfServiceImpl implements MyEtfService {
 
             if (item.getPriceAtAdd() == null) continue;
 
-            boolean isUsStock =
-                    item.getCode() != null &&
-                            item.getCode().matches(".*[A-Za-z].*");
+            boolean isUsStock = isUsStock(item.getCode());
+
 
             double invested = item.getPriceAtAdd();
             if (isUsStock) invested *= usdRate;
@@ -372,6 +391,8 @@ public class MyEtfServiceImpl implements MyEtfService {
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+        double usdRate = marketIndicatorProvider.getUsdRate();
+
         List<MyEtfItemHistoryDTO> list =
                 historyMapper.selectByUserIdEtfNameRestoredYn(
                         userId,
@@ -381,29 +402,60 @@ public class MyEtfServiceImpl implements MyEtfService {
 
         for (MyEtfItemHistoryDTO dto : list) {
 
-            // 편입일 포맷 보정
+            // =========================
+            // 날짜 포맷
+            // =========================
             if (dto.getCreatedAt() != null) {
                 dto.setCreatedAtDisplay(
                         dto.getCreatedAt().format(formatter)
                 );
             }
 
-            // 삭제일 포맷 보정
             if (dto.getDeletedAt() != null) {
                 dto.setDeletedAtDisplay(
                         dto.getDeletedAt().format(formatter)
                 );
             }
 
-            // 편입가 표시용
+            // =========================
+            // 시장 구분
+            // =========================
+            boolean isUsStock = isUsStock(dto.getCode());
+
+
+            dto.setMarket(isUsStock ? "US" : "KR");
+
+            // =========================
+            // 가격 처리
+            // =========================
             if (dto.getPriceAtAdd() != null) {
+
+                double priceAtAddRaw = dto.getPriceAtAdd(); // KR: KRW / US: USD
+                double priceAtAddKrw =
+                        isUsStock ? priceAtAddRaw * usdRate : priceAtAddRaw;
+
+                // KRW 표시용
                 dto.setPriceAtAddDisplay(
-                        String.format("%,d", Math.round(dto.getPriceAtAdd()))
+                        String.format("%,d", Math.round(priceAtAddKrw))
                 );
+
+                // USD 원본은 dto.getPriceAtAdd() 그대로 유지
             }
         }
 
         return list;
     }
+
+    private boolean isUsStock(String code) {
+
+        if (code == null) return false;
+
+        if (companyInfoKrMapper.selectByCode(code) != null) {
+            return false;
+        }
+
+        return companyInfoUsMapper.selectByCode(code) != null;// UNKNOWN → 기본 KR 취급
+    }
+
 
 }

@@ -31,4 +31,6 @@ public class MyEtfItemViewDTO {
     private String addedDate;   // yyyy-MM-dd
 
     private String memo;
+
+    private String market; // "KR" | "US"
 }
