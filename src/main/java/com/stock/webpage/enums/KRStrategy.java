@@ -16,7 +16,12 @@ public enum KRStrategy {
     RSI_70_OVERHEATED_KR("RSI 상단 (70 이상) 진입값"),
     WEEKLY_52W_NEW_HIGH_KR("52주 신고가 (원)"),
     WEEKLY_52W_NEW_LOW_KR("52주 신저가 (원)"),
-    WEEKLY_TOUCH_MA60_KR("주봉 60주선 터치값 (원)");
+    WEEKLY_TOUCH_MA60_KR("주봉 60주선 터치값 (원)"),
+    DUAL_MOMENTUM_1M_KR("듀얼모멘텀 30일 기준 (원)"),
+    DUAL_MOMENTUM_3M_KR("듀얼모멘텀 60일 기준 (원)"),
+    DUAL_MOMENTUM_6M_KR("듀얼모멘텀 180일 기준 (원)"),
+    DUAL_MOMENTUM_1Y_KR("듀얼모멘텀 365일 기준 (원)");
+
 
     private final String captureName;
 

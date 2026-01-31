@@ -16,7 +16,11 @@ public enum USStrategy {
     RSI_70_OVERHEATED_US("RSI 상단 (70 이상) 진입값"),
     WEEKLY_52W_NEW_HIGH_US("52주 신고가 ($)"),
     WEEKLY_52W_NEW_LOW_US("52주 신저가 ($)"),
-    WEEKLY_TOUCH_MA60_US("주봉 60주선 터치값 ($)");
+    WEEKLY_TOUCH_MA60_US("주봉 60주선 터치값 ($)"),
+    DUAL_MOMENTUM_1M_US("듀얼모멘텀 30일 기준 ($)"),
+    DUAL_MOMENTUM_3M_US("듀얼모멘텀 60일 기준 ($)"),
+    DUAL_MOMENTUM_6M_US("듀얼모멘텀 180일 기준 ($)"),
+    DUAL_MOMENTUM_1Y_US("듀얼모멘텀 365일 기준 ($)");
 
     private final String captureName;
 
