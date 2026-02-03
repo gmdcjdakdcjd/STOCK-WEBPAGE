@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.NpsPortfolioItemMapper">
+
+    <select id="selectItemList"
+            resultType="com.stock.webpage.dto.NpsPortfolioItemDTO">
+
+        SELECT
+        rank_no,
+        name,
+        weight_pct,
+        ownership_pct,
+        eval_amount_100m
+        FROM nps_portfolio_item
+        WHERE institution_code = #{institutionCode}
+        AND asset_type = #{asset}
+        AND market = #{market}
+
+        <!-- 검색 -->
+        <if test="q != null and q != ''">
+            AND name LIKE CONCAT('%', #{q}, '%')
+        </if>
+
+        <!-- 🇰🇷 KR: 그냥 순위 -->
+        <if test="market == 'KR'">
+            ORDER BY rank_no
+        </if>
+
+        <!-- 🇺🇸 US: 지분율 NULL 뒤로 -->
+        <if test="market == 'US'">
+            ORDER BY
+            CASE WHEN ownership_pct IS NULL THEN 1 ELSE 0 END,
+            rank_no
+        </if>
+
+    </select>
+
+    <select id="selectAutocompleteNames"
+            resultType="string">
+        SELECT name
+        FROM nps_portfolio_item
+        WHERE institution_code = #{institutionCode}
+          AND asset_type = #{asset}
+          AND market = #{market}
+          AND name LIKE CONCAT('%', #{q}, '%')
+        ORDER BY rank_no
+            LIMIT 10
+    </select>
+
+
+
+</mapper>

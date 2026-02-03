@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.BatchHistoryMapper">
+
+    <!-- 전체 조회 -->
+    <select id="selectAllTimelineOrderByExecStartTimeDesc"
+            resultType="com.stock.webpage.dto.BatchHistoryRow">
+
+        SELECT *
+        FROM (
+                 SELECT
+                     'IN'            AS type,
+                     hist_id         AS histId,
+                     job_id          AS jobId,
+                     job_name        AS jobName,
+                     job_info        AS jobInfo,
+                     exec_start_time AS execStartTime,
+                     exec_end_time   AS execEndTime,
+                     exec_status     AS execStatus,
+                     exec_message    AS execMessage,
+                     exec_date       AS execDate,
+                     duration_ms     AS durationMs
+                 FROM batch_in_h
+
+                 UNION ALL
+
+                 SELECT
+                     'OUT'           AS type,
+                     hist_id         AS histId,
+                     job_id          AS jobId,
+                     job_name        AS jobName,
+                     job_info        AS jobInfo,
+                     exec_start_time AS execStartTime,
+                     exec_end_time   AS execEndTime,
+                     exec_status     AS execStatus,
+                     exec_message    AS execMessage,
+                     exec_date       AS execDate,
+                     duration_ms     AS durationMs
+                 FROM batch_out_h
+             ) t
+        ORDER BY t.execStartTime DESC
+    </select>
+
+</mapper>

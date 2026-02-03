@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.MyEtfItemHistoryMapper">
+
+    <!-- =========================
+         사용자 + ETF 전체 히스토리
+         ========================= -->
+    <select id="selectByUserIdEtfName"
+            resultType="com.stock.webpage.dto.MyEtfItemHistoryDTO">
+        SELECT *
+        FROM my_etf_item_history
+        WHERE user_id = #{userId}
+          AND etf_name = #{etfName}
+        ORDER BY deleted_at DESC
+    </select>
+
+    <!-- =========================
+         사용자 + ETF + 복구 여부
+         ========================= -->
+    <select id="selectByUserIdEtfNameRestoredYn"
+            resultType="com.stock.webpage.dto.MyEtfItemHistoryDTO">
+        SELECT
+            h.hist_id        AS histId,
+            h.code           AS code,
+            h.name           AS name,
+            i.price_at_add   AS priceAtAdd,
+            i.created_at     AS createdAt,   -- 진짜 편입일
+            i.deleted_at     AS deletedAt,
+            i.quantity       AS quantity
+        FROM my_etf_item_history h
+                 JOIN my_etf_item i ON h.etf_item_id = i.id
+        WHERE h.user_id = #{userId}
+          AND h.etf_name = #{etfName}
+          AND h.restored_yn = #{restoredYn}
+        ORDER BY i.deleted_at DESC
+
+    </select>
+
+    <!-- =========================
+         히스토리 단건 INSERT (직접 호출용)
+         ========================= -->
+    <insert id="insertHistory"
+            parameterType="com.stock.webpage.dto.MyEtfItemHistoryDTO"
+            useGeneratedKeys="true"
+            keyProperty="histId">
+        INSERT INTO my_etf_item_history (
+            etf_item_id,
+            user_id,
+            code,
+            name,
+            etf_name,
+            etf_description,
+            price_at_add,
+            quantity,
+            memo,
+            deleted_at,
+            restored_yn
+        ) VALUES (
+                     #{etfItemId},
+                     #{userId},
+                     #{code},
+                     #{name},
+                     #{etfName},
+                     #{etfDescription},
+                     #{priceAtAdd},
+                     #{quantity},
+                     #{memo},
+                     #{deletedAt},
+                     'N'
+                 )
+    </insert>
+
+    <!-- =========================
+         history 복구 처리 (IN 절)
+         ========================= -->
+    <update id="markRestored">
+        UPDATE my_etf_item_history
+        SET restored_yn = 'Y',
+        restored_at = NOW()
+        WHERE hist_id IN
+        <foreach collection="list"
+                 item="id"
+                 open="("
+                 separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- =========================
+         item → history 백업 (핵심)
+         ========================= -->
+    <insert id="backupHistoryFromItem">
+        INSERT INTO my_etf_item_history (
+            etf_item_id,
+            user_id,
+            code,
+            name,
+            etf_name,
+            etf_description,
+            price_at_add,
+            quantity,
+            memo,
+            deleted_at,
+            restored_yn
+        )
+        SELECT
+            id,
+            user_id,
+            code,
+            name,
+            etf_name,
+            etf_description,
+            price_at_add,
+            quantity,
+            memo,
+            NOW(),
+            'N'
+        FROM my_etf_item
+        WHERE id = #{etfItemId}
+          AND user_id = #{userId}
+          AND deleted_yn = 'N'
+    </insert>
+
+    <!-- =========================
+         히스토리 단건 restored 처리
+         ========================= -->
+    <update id="markRestoredById">
+        UPDATE my_etf_item_history
+        SET restored_yn = 'Y',
+            restored_at = NOW()
+        WHERE hist_id = #{histId}
+          AND user_id = #{userId}
+          AND restored_yn = 'N'
+    </update>
+
+    <select id="selectItemIdByHistoryId" resultType="long">
+        SELECT etf_item_id
+        FROM my_etf_item_history
+        WHERE hist_id = #{histId}
+          AND user_id = #{userId}
+          AND restored_yn = 'N'
+    </select>
+
+    <delete id="deleteByUserIdAndEtfName">
+        DELETE FROM my_etf_item_history
+        WHERE user_id = #{userId}
+          AND etf_name = #{etfName}
+    </delete>
+
+
+</mapper>

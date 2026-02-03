@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.DailyPriceUsMapper">
+
+    <!-- =====================================================
+         전체 조회 (최신순)
+         JPA: findAllByCodeOrderByDateDesc
+         ===================================================== -->
+    <select id="selectByCodeOrderByDateDesc"
+            resultType="DailyPriceUsDto">
+        SELECT
+            code,
+            date,
+            open,
+            high,
+            low,
+            close,
+            volume,
+            last_update AS lastUpdate
+        FROM daily_price_us
+        WHERE code = #{code}
+        ORDER BY date DESC
+    </select>
+
+    <!-- =====================================================
+         최신 N개 (차트 / 요약용)
+         ===================================================== -->
+    <select id="selectTopByCodeOrderByDateDesc"
+            resultType="DailyPriceUsDto">
+        SELECT
+            code,
+            date,
+            open,
+            high,
+            low,
+            close,
+            volume,
+            last_update AS lastUpdate
+        FROM daily_price_us
+        WHERE code = #{code}
+        ORDER BY date DESC
+            LIMIT #{limit}
+    </select>
+
+</mapper>

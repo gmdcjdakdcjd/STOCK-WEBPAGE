@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.MyStockMapper">
+
+    <select id="selectMyStockList" resultType="MyStockDTO">
+        SELECT *
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND deleted_yn = 'N'
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectMyStockListPagingKR" resultType="com.stock.webpage.dto.MyStockDTO">
+        SELECT *
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND strategy_name LIKE '%_KR'
+          AND deleted_yn = 'N'
+        ORDER BY created_at DESC
+            LIMIT #{page.limit}
+        OFFSET #{page.offset}
+    </select>
+
+    <select id="countMyStockKR" resultType="int">
+        SELECT COUNT(*)
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND strategy_name LIKE '%_KR'
+          AND deleted_yn = 'N'
+    </select>
+
+    <select id="selectMyStockListPagingUS" resultType="com.stock.webpage.dto.MyStockDTO">
+        SELECT *
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND strategy_name LIKE '%_US'
+          AND deleted_yn = 'N'
+        ORDER BY created_at DESC
+            LIMIT #{page.limit}
+        OFFSET #{page.offset}
+    </select>
+
+    <select id="countMyStockUS" resultType="int">
+        SELECT COUNT(*)
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND strategy_name LIKE '%_US'
+          AND deleted_yn = 'N'
+    </select>
+
+
+    <select id="selectMyStock" resultType="MyStockDTO">
+        SELECT *
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND code = #{code}
+          AND deleted_yn = 'N'
+            LIMIT 1
+    </select>
+
+    <select id="existsMyStock" resultType="int">
+        SELECT COUNT(1)
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND code = #{code}
+          AND deleted_yn = 'N'
+    </select>
+
+    <insert id="insertMyStock"
+            parameterType="MyStockDTO"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO my_stock (
+            user_id,
+            code,
+            name,
+            strategy_name,
+            special_value,
+            price_at_add,
+            target_price_5,
+            target_price_10,
+            memo,
+            deleted_yn
+        ) VALUES (
+                     #{userId},
+                     #{code},
+                     #{name},
+                     #{strategyName},
+                     #{specialValue},
+                     #{priceAtAdd},
+                     #{targetPrice5},
+                     #{targetPrice10},
+                     #{memo},
+                     'N'
+                 )
+    </insert>
+
+    <update id="softDeleteMyStock">
+        UPDATE my_stock
+        SET deleted_yn = 'Y',
+            deleted_at = NOW()
+        WHERE id = #{id}
+          AND user_id = #{userId}
+    </update>
+
+    <select id="selectById" resultType="MyStockDTO">
+        SELECT *
+        FROM my_stock
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectDeletedList" resultType="MyStockDTO">
+        SELECT *
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND deleted_yn = 'Y'
+        ORDER BY deleted_at DESC
+    </select>
+
+    <update id="restoreMyStock">
+        UPDATE my_stock
+        SET deleted_yn = 'N',
+            deleted_at = NULL
+        WHERE id = #{id}
+          AND user_id = #{userId}
+    </update>
+
+    <select id="selectDeletedListPaging"
+            resultType="com.stock.webpage.dto.MyStockDTO">
+        SELECT *
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND deleted_yn = 'Y'
+        ORDER BY deleted_at DESC
+            LIMIT #{page.limit}
+        OFFSET #{page.offset}
+    </select>
+
+
+    <select id="countDeletedList" resultType="int">
+        SELECT COUNT(*)
+        FROM my_stock
+        WHERE user_id = #{userId}
+          AND deleted_yn = 'Y'
+    </select>
+
+
+</mapper>

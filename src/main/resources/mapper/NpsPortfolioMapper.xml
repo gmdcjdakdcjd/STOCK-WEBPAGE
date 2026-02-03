@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.NpsPortfolioMapper">
+
+    <select id="selectLatestSummary"
+            resultType="com.stock.webpage.dto.NpsPortfolioDTO">
+        SELECT
+            institution_code AS institutionCode,
+            base_date        AS baseDate,
+            asset_type       AS assetType,
+            market,
+            total_count      AS totalCount,
+            collected_at     AS collectedAt
+        FROM nps_portfolio_header
+        WHERE institution_code = #{institutionCode}
+          AND base_date = (
+            SELECT MAX(base_date)
+            FROM nps_portfolio_header
+            WHERE institution_code = #{institutionCode}
+        )
+        ORDER BY asset_type, market
+    </select>
+
+</mapper>

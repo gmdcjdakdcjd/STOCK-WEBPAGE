@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.StockIndexMapper">
+
+    <!-- JPA: findByCodeOrderByDateAsc -->
+    <select id="selectByCodeOrderByDateAsc" parameterType="string" resultType="MarketIndicatorDto">
+        SELECT
+            date,
+            code,
+            close,
+            change_amount AS changeAmount,
+            change_rate   AS changeRate,
+            last_update   AS lastUpdate
+        FROM daily_price_stockindex
+        WHERE code = #{code}
+        ORDER BY date ASC
+    </select>
+
+
+</mapper>

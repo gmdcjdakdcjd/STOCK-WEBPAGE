@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.MyStockHistoryMapper">
+
+    <!-- =========================
+         my_stock_id 기준 조회
+         ========================= -->
+    <select id="selectByMyStockId"
+            resultType="MyStockHistoryDTO">
+        SELECT *
+        FROM my_stock_history
+        WHERE my_stock_id = #{myStockId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- =========================
+         user 기준 전체 히스토리
+         ========================= -->
+    <select id="selectByUserId"
+            resultType="MyStockHistoryDTO">
+        SELECT *
+        FROM my_stock_history
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- =========================
+         히스토리 저장
+         ========================= -->
+    <insert id="insertHistory"
+            parameterType="MyStockHistoryDTO"
+            useGeneratedKeys="true"
+            keyProperty="histId">
+        INSERT INTO my_stock_history (
+            my_stock_id,
+            user_id,
+            code,
+            name,
+            action,
+            strategy_name,
+            special_value,
+            price_at_add,
+            target_price_5,
+            target_price_10,
+            memo,
+            note
+        ) VALUES (
+                     #{myStockId},
+                     #{userId},
+                     #{code},
+                     #{name},
+                     #{action},
+                     #{strategyName},
+                     #{specialValue},
+                     #{priceAtAdd},
+                     #{targetPrice5},
+                     #{targetPrice10},
+                     #{memo},
+                     #{note}
+                 )
+    </insert>
+
+</mapper>
