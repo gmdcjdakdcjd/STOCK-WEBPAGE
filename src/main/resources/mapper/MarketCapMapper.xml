@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.MarketCapMapper">
+
+    <select id="findAllCompanyBasicInfo"
+            resultType="com.stock.webpage.dto.MarketCapDTO">
+        SELECT
+            code,
+            name,
+            listed_stock_count AS listedStockCount
+        FROM company_info_kr
+    </select>
+
+    <select id="selectMarketCapList"
+            resultType="com.stock.webpage.dto.MarketCapDTO">
+        SELECT
+            c.code,
+            c.name,
+            c.listed_stock_count AS listedStockCount,
+            p.close AS currentPrice,
+            (COALESCE(c.listed_stock_count, 0) * p.close) AS marketCap,
+            RANK() OVER (
+            ORDER BY (COALESCE(c.listed_stock_count, 0) * p.close) DESC
+        ) AS ranking
+        FROM company_info_kr c
+                 JOIN (
+            SELECT *
+            FROM daily_price_kr
+            WHERE date = (SELECT MAX(date) FROM daily_price_kr)
+        ) p ON c.code = p.code
+        ORDER BY marketCap DESC
+    </select>
+
+
+
+
+</mapper>
