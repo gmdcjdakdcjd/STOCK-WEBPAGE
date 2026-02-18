@@ -59,10 +59,9 @@
             special_value  AS specialValue,
             created_at     AS createdAt
         FROM strategy_detail
-        WHERE
-            name   LIKE CONCAT('%', #{keyword}, '%')
-           OR code LIKE CONCAT('%', #{keyword}, '%')
-           OR action LIKE CONCAT('%', #{keyword}, '%')
+        WHERE name   = #{keyword}
+           OR code =  #{keyword}
+--            OR action LIKE CONCAT('%', #{keyword}, '%')
         ORDER BY signal_date DESC, special_value ASC
     </select>
 
