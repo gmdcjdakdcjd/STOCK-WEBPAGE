@@ -87,4 +87,8 @@ public class PageRequestDTO {
 
         return link;
     }
+
+    public int getLimitPlusOne() {
+        return size + 1;
+    }
 }

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.ProgramTrendMapper">
+
+    <!-- 최신 2건 조회 -->
+    <select id="selectLatestTwoProgramTrend"
+            resultType="com.stock.webpage.dto.ProgramTrendDTO">
+
+        SELECT
+            id,
+            base_date AS baseDate,
+            arb_buy AS arbBuy,
+            arb_sell AS arbSell,
+            arb_net AS arbNet,
+            nonarb_buy AS nonarbBuy,
+            nonarb_sell AS nonarbSell,
+            nonarb_net AS nonarbNet,
+            total_buy AS totalBuy,
+            total_sell AS totalSell,
+            total_net AS totalNet,
+            last_update AS lastUpdate
+        FROM program_trend_day
+        ORDER BY base_date DESC
+            LIMIT 2
+
+    </select>
+
+
+    <!-- 최신 1건 -->
+    <select id="selectLatestProgramTrend"
+            resultType="com.stock.webpage.dto.ProgramTrendDTO">
+
+        SELECT
+            id,
+            base_date AS baseDate,
+            arb_buy AS arbBuy,
+            arb_sell AS arbSell,
+            arb_net AS arbNet,
+            nonarb_buy AS nonarbBuy,
+            nonarb_sell AS nonarbSell,
+            nonarb_net AS nonarbNet,
+            total_buy AS totalBuy,
+            total_sell AS totalSell,
+            total_net AS totalNet,
+            last_update AS lastUpdate
+        FROM program_trend_day
+        ORDER BY base_date DESC
+            LIMIT 1
+
+    </select>
+
+
+    <!-- 페이징 조회 -->
+    <select id="selectProgramTrendList"
+            parameterType="com.stock.webpage.dto.PageRequestDTO"
+            resultType="com.stock.webpage.dto.ProgramTrendDTO">
+
+        SELECT
+            id,
+            base_date AS baseDate,
+            arb_buy AS arbBuy,
+            arb_sell AS arbSell,
+            arb_net AS arbNet,
+            nonarb_buy AS nonarbBuy,
+            nonarb_sell AS nonarbSell,
+            nonarb_net AS nonarbNet,
+            total_buy AS totalBuy,
+            total_sell AS totalSell,
+            total_net AS totalNet,
+            last_update AS lastUpdate
+        FROM program_trend_day
+        ORDER BY base_date DESC
+            LIMIT #{limit}
+        OFFSET #{offset}
+
+    </select>
+
+
+    <!-- 전체 개수 -->
+    <select id="selectProgramTrendCount"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM program_trend_day
+
+    </select>
+
+</mapper>

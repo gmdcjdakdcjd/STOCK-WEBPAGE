@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.InvestorTrendMapper">
+
+    <!-- 최신 1건 조회 -->
+    <select id="selectLatestInvestorTrend"
+            resultType="com.stock.webpage.dto.InvestorFlowDTO">
+        SELECT
+            id,
+            base_date AS baseDate,
+            individual,
+            foreigner,
+            institutional,
+            fin_invest AS finInvest,
+            insurance,
+            inv_trust AS invTrust,
+            bank,
+            etc_fin AS etcFin,
+            pension,
+            etc_corp AS etcCorp,
+            last_update AS lastUpdate
+        FROM investor_trend_daily
+        ORDER BY base_date DESC
+            LIMIT 1
+    </select>
+
+
+    <!-- 페이징 리스트 조회 -->
+    <select id="selectInvestorTrendList"
+            parameterType="com.stock.webpage.dto.PageRequestDTO"
+            resultType="com.stock.webpage.dto.InvestorFlowDTO">
+
+        SELECT
+            id,
+            base_date AS baseDate,
+            individual,
+            foreigner,
+            institutional,
+            fin_invest AS finInvest,
+            insurance,
+            inv_trust AS invTrust,
+            bank,
+            etc_fin AS etcFin,
+            pension,
+            etc_corp AS etcCorp,
+            last_update AS lastUpdate
+        FROM investor_trend_daily
+        ORDER BY base_date DESC
+            LIMIT #{limit}
+        OFFSET #{offset}
+
+    </select>
+
+
+    <!-- 전체 개수 -->
+    <select id="selectInvestorTrendCount"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM investor_trend_daily
+    </select>
+
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.DepositTrendMapper">
+
+
+    <select id="selectLatestTwoDepositTrend"
+            resultType="com.stock.webpage.dto.DepositTrendDTO">
+
+        SELECT
+            id,
+            base_date AS baseDate,
+            cust_deposit AS custDeposit,
+            cust_deposit_change AS custDepositChange,
+            credit_balance AS creditBalance,
+            credit_balance_change AS creditBalanceChange,
+            stock_fund AS stockFund,
+            stock_fund_change AS stockFundChange,
+            mixed_fund AS mixedFund,
+            mixed_fund_change AS mixedFundChange,
+            bond_fund AS bondFund,
+            bond_fund_change AS bondFundChange,
+            last_update AS lastUpdate
+        FROM deposit_daily
+        ORDER BY base_date DESC
+            LIMIT 2
+
+    </select>
+
+    <select id="selectDepositTrendList"
+            parameterType="com.stock.webpage.dto.PageRequestDTO"
+            resultType="com.stock.webpage.dto.DepositTrendDTO">
+
+        SELECT
+            id,
+            base_date AS baseDate,
+            cust_deposit AS custDeposit,
+            cust_deposit_change AS custDepositChange,
+            credit_balance AS creditBalance,
+            credit_balance_change AS creditBalanceChange,
+            stock_fund AS stockFund,
+            stock_fund_change AS stockFundChange,
+            mixed_fund AS mixedFund,
+            mixed_fund_change AS mixedFundChange,
+            bond_fund AS bondFund,
+            bond_fund_change AS bondFundChange,
+            last_update AS lastUpdate
+        FROM deposit_daily
+        ORDER BY base_date DESC
+            LIMIT #{limitPlusOne}
+        OFFSET #{offset}
+
+    </select>
+
+    <select id="selectDepositTrendCount" resultType="int">
+        SELECT COUNT(*)
+        FROM deposit_daily
+    </select>
+
+</mapper>
