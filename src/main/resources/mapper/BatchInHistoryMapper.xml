@@ -5,21 +5,21 @@
 
 <mapper namespace="com.stock.webpage.mapper.BatchInHistoryMapper">
 
-    <select id="selectAllOrderByExecStartTimeDesc" resultType="BatchInHistoryDto">
-        SELECT
-            hist_id         AS histId,
-            job_id          AS jobId,
-            job_name        AS jobName,
-            job_info        AS jobInfo,
-            exec_start_time AS execStartTime,
-            exec_end_time   AS execEndTime,
-            exec_status     AS execStatus,
-            exec_message    AS execMessage,
-            exec_date       AS execDate,
-            duration_ms     AS durationMs
-        FROM batch_in_h
-        ORDER BY exec_start_time DESC
-    </select>
+<!--    <select id="selectAllOrderByExecStartTimeDesc" resultType="BatchInHistoryDto">-->
+<!--        SELECT-->
+<!--            hist_id         AS histId,-->
+<!--            job_id          AS jobId,-->
+<!--            job_name        AS jobName,-->
+<!--            job_info        AS jobInfo,-->
+<!--            exec_start_time AS execStartTime,-->
+<!--            exec_end_time   AS execEndTime,-->
+<!--            exec_status     AS execStatus,-->
+<!--            exec_message    AS execMessage,-->
+<!--            exec_date       AS execDate,-->
+<!--            duration_ms     AS durationMs-->
+<!--        FROM batch_in_h-->
+<!--        ORDER BY exec_start_time DESC-->
+<!--    </select>-->
 
 
 </mapper>

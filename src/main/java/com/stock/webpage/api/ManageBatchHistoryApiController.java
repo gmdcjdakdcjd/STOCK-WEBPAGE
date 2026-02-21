@@ -1,8 +1,6 @@
 package com.stock.webpage.api;
 
-import com.stock.webpage.dto.PageRequestDTO;
-import com.stock.webpage.dto.PageResponseDTO;
-import com.stock.webpage.dto.BatchDateGroupDTO;
+import com.stock.webpage.dto.*;
 import com.stock.webpage.service.ManageBatchHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,13 +16,25 @@ public class ManageBatchHistoryApiController {
     private final ManageBatchHistoryService historyService;
 
     /* =========================
-       배치 이력 조회 (관리자)
+        날짜 목록 조회
        ========================= */
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/batch/history")
-    public PageResponseDTO<BatchDateGroupDTO> getBatchHistory(
+    @GetMapping("/batch/history/dates")
+    public PageResponseDTO<BatchDateGroupDTO> getHistoryDates(
             PageRequestDTO pageRequestDTO
     ) {
-        return historyService.getGroupedHistory(pageRequestDTO);
+        return historyService.getHistoryDates(pageRequestDTO);
+    }
+
+    /* =========================
+        특정 날짜 상세 조회
+       ========================= */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/batch/history/{date}")
+    public PageResponseDTO<BatchHistoryView> getHistoryByDate(
+            @PathVariable String date,
+            PageRequestDTO pageRequestDTO
+    ) {
+        return historyService.getHistoryByDate(date, pageRequestDTO);
     }
 }

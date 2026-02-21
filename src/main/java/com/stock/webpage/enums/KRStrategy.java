@@ -20,7 +20,10 @@ public enum KRStrategy {
     DUAL_MOMENTUM_1M_KR("듀얼모멘텀 30일 기준 (원)"),
     DUAL_MOMENTUM_3M_KR("듀얼모멘텀 60일 기준 (원)"),
     DUAL_MOMENTUM_6M_KR("듀얼모멘텀 180일 기준 (원)"),
-    DUAL_MOMENTUM_1Y_KR("듀얼모멘텀 365일 기준 (원)");
+    DUAL_MOMENTUM_1Y_KR("듀얼모멘텀 365일 기준 (원)"),
+    DAILY_TOP20_VOLUME_KR("상위 20 거래량 (원)"),
+    DAILY_DROP_SPIKE_KR("급락 스파이크 (원)"),
+    DAILY_RISE_SPIKE_KR("급등 스파이크 (원)");
 
 
     private final String captureName;

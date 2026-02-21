@@ -20,7 +20,10 @@ public enum USStrategy {
     DUAL_MOMENTUM_1M_US("듀얼모멘텀 30일 기준 ($)"),
     DUAL_MOMENTUM_3M_US("듀얼모멘텀 60일 기준 ($)"),
     DUAL_MOMENTUM_6M_US("듀얼모멘텀 180일 기준 ($)"),
-    DUAL_MOMENTUM_1Y_US("듀얼모멘텀 365일 기준 ($)");
+    DUAL_MOMENTUM_1Y_US("듀얼모멘텀 365일 기준 ($)"),
+    DAILY_DROP_SPIKE_US("급락 스파이크 ($)"),
+    DAILY_RISE_SPIKE_US("급등 스파이크 ($)"),
+    DAILY_TOP20_VOLUME_US("상위 20 거래량 ($)");
 
     private final String captureName;
 
