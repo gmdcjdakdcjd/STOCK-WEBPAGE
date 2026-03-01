@@ -28,6 +28,9 @@
     <!-- =====================================================
          자동완성 (이름 / 코드)
          ===================================================== -->
+    <!-- =====================================================
+         자동완성 (이름 / 코드)
+         ===================================================== -->
     <select id="selectTopByNameOrCodeContaining"
             resultType="com.stock.webpage.dto.CompanyInfoKrDTO">
 
@@ -39,12 +42,12 @@
             c.stock_type    AS stockType,
             c.std_code      AS stdCode,
             c.last_update   AS lastUpdate,
-            p.close   AS price
+            p.close         AS price
         FROM company_info_kr c
                  LEFT JOIN (
             SELECT
-                code,
-                close
+                d.code,
+                d.close
             FROM daily_price_kr d
             WHERE d.date = (
                 SELECT MAX(date)
@@ -60,11 +63,27 @@
           AND c.stock_type = '보통주'
         ORDER BY
             CASE
+                -- 0: 코드 완전 일치
                 WHEN LOWER(c.code) = LOWER(#{keyword}) THEN 0
+
+                -- 1: 이름 완전 일치
                 WHEN LOWER(c.name) = LOWER(#{keyword}) THEN 1
-                ELSE 2
+
+                -- 2: 이름이 keyword로 시작
+                WHEN LOWER(c.name) LIKE CONCAT(LOWER(#{keyword}), '%') THEN 2
+
+                -- 3: 코드가 keyword로 시작
+                WHEN LOWER(c.code) LIKE CONCAT(LOWER(#{keyword}), '%') THEN 3
+
+                -- 4: 이름에 포함
+                WHEN LOWER(c.name) LIKE CONCAT('%', LOWER(#{keyword}), '%') THEN 4
+
+                -- 5: 코드에 포함
+                WHEN LOWER(c.code) LIKE CONCAT('%', LOWER(#{keyword}), '%') THEN 5
+
+                ELSE 6
                 END,
-            c.name
+            c.name ASC
             LIMIT #{limit}
 
     </select>

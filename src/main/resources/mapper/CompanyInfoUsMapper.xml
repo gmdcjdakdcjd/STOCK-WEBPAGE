@@ -27,6 +27,9 @@
     <!-- =====================================================
          자동완성 (이름 / 코드)
          ===================================================== -->
+    <!-- =====================================================
+     자동완성 (이름 / 코드) - US
+     ===================================================== -->
     <select id="selectTopByNameOrCodeContaining"
             resultType="com.stock.webpage.dto.CompanyInfoUsDTO">
 
@@ -52,15 +55,33 @@
             )
         ) p ON c.code = p.code
         WHERE
-            LOWER(c.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-           OR LOWER(c.code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+            (
+                LOWER(c.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                    OR LOWER(c.code) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                )
         ORDER BY
             CASE
+                -- 0: 코드 완전 일치
                 WHEN LOWER(c.code) = LOWER(#{keyword}) THEN 0
+
+                -- 1: 이름 완전 일치
                 WHEN LOWER(c.name) = LOWER(#{keyword}) THEN 1
-                ELSE 2
+
+                -- 2: 이름 시작 일치
+                WHEN LOWER(c.name) LIKE CONCAT(LOWER(#{keyword}), '%') THEN 2
+
+                -- 3: 코드 시작 일치
+                WHEN LOWER(c.code) LIKE CONCAT(LOWER(#{keyword}), '%') THEN 3
+
+                -- 4: 이름 포함
+                WHEN LOWER(c.name) LIKE CONCAT('%', LOWER(#{keyword}), '%') THEN 4
+
+                -- 5: 코드 포함
+                WHEN LOWER(c.code) LIKE CONCAT('%', LOWER(#{keyword}), '%') THEN 5
+
+                ELSE 6
                 END,
-            c.name
+            c.name ASC
             LIMIT #{limit}
 
     </select>
