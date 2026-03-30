@@ -31,8 +31,9 @@
             last_update AS lastUpdate
         FROM kodex_etf_summary
         WHERE
-            LOWER(etf_name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-        ORDER BY etf_id ASC
+            REPLACE(LOWER(etf_name), ' ', '')
+                LIKE CONCAT('%', REPLACE(LOWER(#{keyword}), ' ', ''), '%')
+        ORDER BY etf_id ASC;
     </select>
 
     <!-- ETF ID 목록으로 조회 -->

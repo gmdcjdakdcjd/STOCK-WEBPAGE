@@ -25,12 +25,12 @@ public class IssueApiController {
     public Map<String, List<StrategyDetailDTO>> issue() {
 
         String[] strategies = {
-                "DAILY_DROP_SPIKE_KR",
                 "DAILY_RISE_SPIKE_KR",
+                "DAILY_DROP_SPIKE_KR",
                 "DAILY_TOP20_VOLUME_KR",
                 "ETF_TOP20_VOLUME_KR",
-                "DAILY_DROP_SPIKE_US",
                 "DAILY_RISE_SPIKE_US",
+                "DAILY_DROP_SPIKE_US",
                 "DAILY_TOP20_VOLUME_US",
                 "ETF_TOP20_VOLUME_US"
         };

@@ -40,16 +40,17 @@
     <!-- suffix 조건 제거 -->
     <select id="selectStrategyResults" resultType="StrategyResultDto">
         SELECT
-        strategy_name AS strategyName,
-        signal_date   AS signalDate,
-        signal_type   AS signalType,
-        total_data    AS totalData,
-        created_at    AS createdAt
-        FROM strategy_result
+        t1.strategy_name AS strategyName,
+        t1.signal_date   AS signalDate,
+        t1.signal_type   AS signalType,
+        t1.total_data    AS totalData,
+        t1.created_at    AS createdAt
+        FROM strategy_result t1
+        left join strategy_master t2 on t1.strategy_name = t2.strategy_name
         WHERE 1 = 1
 
         <if test="strategies != null and strategies.size() > 0">
-            AND strategy_name IN
+            AND t1.strategy_name IN
             <foreach collection="strategies" item="s" open="(" separator="," close=")">
                 #{s}
             </foreach>
@@ -57,18 +58,18 @@
 
         <!-- 단일 전략 필터 -->
         <if test="strategy != null and strategy != ''">
-            AND strategy_name = #{strategy}
+            AND t1.strategy_name = #{strategy}
         </if>
 
         <if test="signalDate != null">
             <![CDATA[
-                AND signal_date >= #{signalDate}
-                AND signal_date < DATE_ADD(#{signalDate}, INTERVAL 1 DAY)
+                AND t1.signal_date >= #{signalDate}
+                AND t1.signal_date < DATE_ADD(#{signalDate}, INTERVAL 1 DAY)
             ]]>
         </if>
 
 
-        ORDER BY signal_date DESC
+        ORDER BY t1.signal_date DESC, t2.strategy_id asc
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
