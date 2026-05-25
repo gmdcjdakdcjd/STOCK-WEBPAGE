@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stock.webpage.mapper.TigerEtfSummaryMapper">
+
+    <!-- 전체 ETF -->
+    <select id="selectAll"
+            resultType="com.stock.webpage.dto.TigerEtfSummaryDTO">
+
+        SELECT
+            s.etf_id      AS etfId,
+            s.base_date   AS baseDate,
+            e.name        AS etfName,
+            s.total_cnt   AS totalCnt,
+            s.last_update AS lastUpdate
+        FROM tiger_etf_summary s
+                 INNER JOIN etf_info_kr e
+                            ON s.etf_id = e.code
+        ORDER BY s.total_cnt desc
+
+    </select>
+
+    <!-- ETF명 / ETF코드 검색 -->
+    <select id="selectByEtfNameOrEtfId"
+            resultType="com.stock.webpage.dto.TigerEtfSummaryDTO">
+
+        SELECT
+            s.etf_id      AS etfId,
+            s.base_date   AS baseDate,
+            e.name        AS etfName,
+            s.total_cnt   AS totalCnt,
+            s.last_update AS lastUpdate
+
+        FROM tiger_etf_summary s
+                 INNER JOIN etf_info_kr e
+                            ON s.etf_id = e.code
+
+        WHERE
+            LOWER(e.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+           OR
+            LOWER(s.etf_id) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+
+        ORDER BY e.name ASC
+
+    </select>
+
+    <!-- ETF ID 목록으로 조회 -->
+    <select id="selectByEtfIdIn"
+            resultType="com.stock.webpage.dto.TigerEtfSummaryDTO">
+        SELECT
+            s.etf_id      AS etfId,
+            s.base_date   AS baseDate,
+            e.name        AS etfName,
+            s.total_cnt   AS totalCnt,
+            s.last_update AS lastUpdate
+        FROM tiger_etf_summary s
+                 INNER JOIN etf_info_kr e
+                            ON s.etf_id = e.code
+        WHERE s.etf_id IN
+        <foreach collection="etfIds"
+                 item="etfId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{etfId}
+        </foreach>
+        ORDER BY e.name ASC
+    </select>
+
+</mapper>

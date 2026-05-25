@@ -53,6 +53,7 @@ public class ApiSecurityConfig {
                                 "/api/result/**",
                                 "/api/nps/**",
                                 "/api/kodex/**",
+                                "/api/tiger/**",
                                 "/api/common/**",
                                 "/api/exchange",
                                 "/api/physical",
