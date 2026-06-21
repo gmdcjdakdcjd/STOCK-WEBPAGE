@@ -8,15 +8,26 @@
     <!-- JPA: findByCodeOrderByDateAsc -->
     <select id="selectByCodeOrderByDateAsc" parameterType="string" resultType="MarketIndicatorDto">
         SELECT
-            date,
-            code,
-            close,
-            change_amount AS changeAmount,
-            change_rate   AS changeRate,
-            last_update   AS lastUpdate
-        FROM daily_price_crypto
-        WHERE code = #{code}
-        ORDER BY date ASC
+            sub.date,
+            sub.code,
+            sub.close,
+            sub.changeAmount,
+            sub.changeRate,
+            sub.lastUpdate
+        FROM (
+                 SELECT
+                     date,
+                     code,
+                     close,
+                     change_amount AS changeAmount,
+                     change_rate   AS changeRate,
+                     last_update   AS lastUpdate
+                 FROM daily_price_crypto
+                 WHERE code = #{code}
+                 ORDER BY date DESC
+                     LIMIT 365
+             ) AS sub
+        ORDER BY sub.date ASC
     </select>
 
 
