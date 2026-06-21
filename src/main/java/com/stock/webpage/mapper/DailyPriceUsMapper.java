@@ -19,4 +19,11 @@ public interface DailyPriceUsMapper {
             @Param("code") String code,
             @Param("limit") int limit
     );
+
+    // 가격 테이블 페이징 조회용
+    List<DailyPriceUsDTO> selectPricePageByCode(
+            @Param("code") String code,
+            @Param("limit") int limit,
+            @Param("offset") int offset
+    );
 }

@@ -56,11 +56,11 @@ public class StockApiController {
                         : stockCode;
 
         /* ==========================
-           전략 포착 이력
+           전략 포착 이력 (최초 10개 페이징 조회)
            ========================== */
         result.put(
                 "signalList",
-                strategyDetailService.searchDetail(keyword)
+                strategyDetailService.searchDetailPaged(keyword, 1, 10)
         );
 
         /* ==========================
@@ -75,6 +75,7 @@ public class StockApiController {
             result.put("error", "해당 종목 정보를 찾을 수 없습니다.");
             result.put("stock", null);
             result.put("priceList", Collections.emptyList());
+            result.put("chartPriceList", Collections.emptyList());
             return result;
         }
 
@@ -88,34 +89,92 @@ public class StockApiController {
                 "KOSPI".equals(stockInfo.getMarketType())
                         || "KOSDAQ".equals(stockInfo.getMarketType());
 
-        List<Map<String, Object>> priceList =
-                stockInfo.getPriceList().stream()
-                        .map(p -> {
-                            Map<String, Object> map = new HashMap<>();
+        // 가격 테이블용 데이터 가공 (최대 20개)
+        result.put("priceList", convertPriceList(stockInfo.getPriceList(), isKR));
 
-                            map.put("date", p.getDate().toString());
-
-                            if (isKR) {
-                                // 한국: 정수 처리
-                                map.put("open",  (long) p.getOpen());
-                                map.put("high",  (long) p.getHigh());
-                                map.put("low",   (long) p.getLow());
-                                map.put("close", (long) p.getClose());
-                            } else {
-                                // 미국: 소수점 2자리
-                                map.put("open",  Math.round(p.getOpen()  * 100) / 100.0);
-                                map.put("high",  Math.round(p.getHigh()  * 100) / 100.0);
-                                map.put("low",   Math.round(p.getLow()   * 100) / 100.0);
-                                map.put("close", Math.round(p.getClose() * 100) / 100.0);
-                            }
-
-                            map.put("volume", p.getVolume());
-                            return map;
-                        })
-                        .toList();
-
-        result.put("priceList", priceList);
+        // 차트 표시용 데이터 가공 (최대 365개)
+        result.put("chartPriceList", convertPriceList(stockInfo.getChartPriceList(), isKR));
 
         return result;
+    }
+
+    /**
+     * 주가 리스트 데이터를 화면 표시 형식(한국 주식 정수 처리 / 미국 주식 소수점 2자리 처리)에 맞추어 변환합니다.
+     *
+     * @param sourceList 원본 PriceDTO 리스트
+     * @param isKR 한국 주식 여부
+     * @return 가공된 맵 리스트
+     */
+    private List<Map<String, Object>> convertPriceList(List<com.stock.webpage.dto.PriceDTO> sourceList, boolean isKR) {
+        if (sourceList == null) {
+            return Collections.emptyList();
+        }
+
+        return sourceList.stream()
+                .map(p -> {
+                    Map<String, Object> map = new HashMap<>();
+
+                    map.put("date", p.getDate().toString());
+
+                    if (isKR) {
+                        // 한국 주식: 소수점을 버리고 정수형으로 처리
+                        map.put("open",  (long) p.getOpen());
+                        map.put("high",  (long) p.getHigh());
+                        map.put("low",   (long) p.getLow());
+                        map.put("close", (long) p.getClose());
+                    } else {
+                        // 미국 주식: 달러 단위 소수점 둘째 자리까지 반올림 처리
+                        map.put("open",  Math.round(p.getOpen()  * 100) / 100.0);
+                        map.put("high",  Math.round(p.getHigh()  * 100) / 100.0);
+                        map.put("low",   Math.round(p.getLow()   * 100) / 100.0);
+                        map.put("close", Math.round(p.getClose() * 100) / 100.0);
+                    }
+
+                    map.put("volume", p.getVolume());
+                    return map;
+                })
+                .toList();
+    }
+
+    /* ==============================
+       종목 가격 페이징 조회 (React API)
+       ============================== */
+    @GetMapping("/prices")
+    public List<Map<String, Object>> getPrices(
+            @RequestParam String code,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        log.info("종목 가격 페이징 요청: code={}, page={}, size={}", code, page, size);
+
+        // 마켓 타입(한국/미국) 판별을 위해 종목 기본 정보를 가져옵니다.
+        StockDTO stockInfo = stockService.getStockInfo(null, code);
+        if (stockInfo == null) {
+            return Collections.emptyList();
+        }
+
+        boolean isKR = "KOSPI".equals(stockInfo.getMarketType())
+                || "KOSDAQ".equals(stockInfo.getMarketType());
+
+        // 페이징 처리된 원본 데이터를 조회합니다.
+        List<com.stock.webpage.dto.PriceDTO> pricePage = stockService.getPricePage(code, page, size);
+
+        // 한국/미국 주식 포맷에 맞추어 변환하여 리턴합니다.
+        return convertPriceList(pricePage, isKR);
+    }
+
+    /* ==============================
+       종목 조건 포착 정보 페이징 조회 (React API)
+       ============================== */
+    @GetMapping("/signals")
+    public List<com.stock.webpage.dto.StrategyDetailDTO> getSignals(
+            @RequestParam String code,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        log.info("종목 조건 포착 정보 페이징 요청: code={}, page={}, size={}", code, page, size);
+
+        // 페이징 처리된 조건 포착(시그널) 이력을 조회하여 반환합니다.
+        return strategyDetailService.searchDetailPaged(code, page, size);
     }
 }

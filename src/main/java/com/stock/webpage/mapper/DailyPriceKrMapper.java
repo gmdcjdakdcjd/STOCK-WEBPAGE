@@ -19,4 +19,11 @@ public interface DailyPriceKrMapper {
             @Param("code") String code,
             @Param("limit") int limit
     );
+
+    // 가격 테이블 페이징 조회용
+    List<DailyPriceKrDTO> selectPricePageByCode(
+            @Param("code") String code,
+            @Param("limit") int limit,
+            @Param("offset") int offset
+    );
 }

@@ -24,11 +24,10 @@
         FROM daily_price_kr
         WHERE code = #{code}
         ORDER BY date DESC
+        LIMIT 365
     </select>
 
-    <!-- =====================================================
-         최신 N개 (차트 / 요약용)
-         ===================================================== -->
+    <!-- 최신 N개 (차트 / 요약용) -->
     <select id="selectTopByCodeOrderByDateDesc"
             resultType="DailyPriceKrDto">
         SELECT
@@ -45,6 +44,25 @@
         WHERE code = #{code}
         ORDER BY date DESC
             LIMIT #{limit}
+    </select>
+
+    <!-- 가격 테이블 페이징 조회용 -->
+    <select id="selectPricePageByCode"
+            resultType="DailyPriceKrDto">
+        SELECT
+            code,
+            date,
+            open,
+            high,
+            low,
+            close,
+            diff,
+            volume,
+            last_update AS lastUpdate
+        FROM daily_price_kr
+        WHERE code = #{code}
+        ORDER BY date DESC
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
 </mapper>

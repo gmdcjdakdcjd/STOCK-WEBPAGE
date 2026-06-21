@@ -65,4 +65,25 @@
         ORDER BY signal_date DESC, special_value ASC
     </select>
 
+    <!-- 키워드 검색 (페이징) -->
+    <select id="selectByKeywordPaged" resultType="StrategyDetailDto">
+        SELECT
+            result_id      AS resultId,
+            signal_date    AS signalDate,
+            code,
+            name,
+            action,
+            price,
+            prev_close     AS prevClose,
+            diff,
+            volume,
+            special_value  AS specialValue,
+            created_at     AS createdAt
+        FROM strategy_detail
+        WHERE name   = #{keyword}
+           OR code =  #{keyword}
+        ORDER BY signal_date DESC, special_value ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
 </mapper>

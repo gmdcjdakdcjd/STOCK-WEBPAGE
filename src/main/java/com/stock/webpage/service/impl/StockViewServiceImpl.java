@@ -76,12 +76,23 @@ public class StockViewServiceImpl implements StockViewService {
                                     .build())
                             .toList();
 
+            // 차트 표시를 위한 1년치 데이터 (최대 365개)
+            List<PriceDTO> chartPrices = prices.stream()
+                    .limit(365)
+                    .toList();
+
+            // 가격 테이블 표시를 위한 최초 데이터 (최대 20개)
+            List<PriceDTO> tablePrices = prices.stream()
+                    .limit(20)
+                    .toList();
+
             return StockDTO.builder()
                     .code(kr.getCode())
                     .name(kr.getName())
                     .marketType(kr.getMarketType()) // KOSPI / KOSDAQ
                     .companyInfoKr(kr)
-                    .priceList(prices)
+                    .chartPriceList(chartPrices)
+                    .priceList(tablePrices)
                     .build();
         }
 
@@ -101,12 +112,68 @@ public class StockViewServiceImpl implements StockViewService {
                                 .build())
                         .toList();
 
+        // 차트 표시를 위한 1년치 데이터 (최대 365개)
+        List<PriceDTO> chartPrices = prices.stream()
+                .limit(365)
+                .toList();
+
+        // 가격 테이블 표시를 위한 최초 데이터 (최대 20개)
+        List<PriceDTO> tablePrices = prices.stream()
+                .limit(20)
+                .toList();
+
         return StockDTO.builder()
                 .code(us.getCode())
                 .name(us.getName())
                 .marketType(us.getMarket()) // NASDAQ / NYSE
                 .companyInfoUs(us)
-                .priceList(prices)
+                .chartPriceList(chartPrices)
+                .priceList(tablePrices)
                 .build();
+    }
+
+    /**
+     * 특정 종목코드의 가격 데이터를 페이징 처리하여 조회합니다.
+     *
+     * @param stockCode 종목코드
+     * @param page 페이지 번호 (1부터 시작)
+     * @param size 한 페이지당 조회할 개수
+     * @return 가공되지 않은 가격 정보 리스트
+     */
+    @Override
+    public List<PriceDTO> getPricePage(String stockCode, int page, int size) {
+        int limit = size;
+        int offset = (page - 1) * size;
+
+        // 종목 코드가 한국 주식 마켓 정보에 등록되어 있는지 확인합니다.
+        boolean isKr = companyInfoKrMapper.selectByCode(stockCode) != null;
+
+        if (isKr) {
+            // 한국 주식일 경우 일별 주가 테이블에서 페이징 쿼리를 수행합니다.
+            return dailyPriceKrMapper.selectPricePageByCode(stockCode, limit, offset)
+                    .stream()
+                    .map(p -> PriceDTO.builder()
+                            .date(p.getDate())
+                            .open(p.getOpen())
+                            .high(p.getHigh())
+                            .low(p.getLow())
+                            .close(p.getClose())
+                            .volume(p.getVolume())
+                            .build())
+                    .toList();
+        } else {
+            // 미국 주식일 경우 일별 주가 테이블에서 페이징 쿼리를 수행합니다.
+            return dailyPriceUsMapper.selectPricePageByCode(stockCode, limit, offset)
+                    .stream()
+                    .map(p -> PriceDTO.builder()
+                            .date(p.getDate())
+                            .open(p.getOpen())
+                            .high(p.getHigh())
+                            .low(p.getLow())
+                            .close(p.getClose())
+                            .volume(p.getVolume())
+                            .build())
+                    .toList();
+        }
     }
 }

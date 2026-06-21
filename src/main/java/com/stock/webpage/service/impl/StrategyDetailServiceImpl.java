@@ -114,4 +114,35 @@ public class StrategyDetailServiceImpl implements StrategyDetailService {
         if (v == null) return null;
         return Math.floor(v * 100) / 100.0;
     }
+
+    /**
+     * 특정 키워드(종목코드/종목명) 기준 전략 포착 이력(시그널)을 페이징 처리하여 조회합니다.
+     *
+     * @param keyword 종목코드 또는 종목명
+     * @param page 페이지 번호 (1부터 시작)
+     * @param size 한 페이지당 조회할 개수
+     * @return 가공된 시그널 정보 리스트
+     */
+    @Override
+    public List<StrategyDetailDTO> searchDetailPaged(String keyword, int page, int size) {
+        int limit = size;
+        int offset = (page - 1) * size;
+
+        // DB에서 페이징 처리된 조건 포착 상세 내역 리스트를 읽어옵니다.
+        List<StrategyDetailDTO> list =
+                strategyDetailMapper.selectByKeywordPaged(keyword, limit, offset);
+
+        // 각각의 시그널 데이터에 대응하는 전략 마스터 코드 정보를 매핑해 줍니다.
+        for (StrategyDetailDTO dto : list) {
+            StrategyCode sc = StrategyCode.findByCode(dto.getAction());
+
+            if (sc != null) {
+                dto.setStrategy(
+                        new StrategyCodeDTO(sc.getCode(), sc.getLabel())
+                );
+            }
+        }
+
+        return list;
+    }
 }

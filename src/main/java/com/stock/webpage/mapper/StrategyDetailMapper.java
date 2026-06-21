@@ -28,4 +28,11 @@ public interface StrategyDetailMapper {
     List<StrategyDetailDTO> selectByKeyword(
             @Param("keyword") String keyword
     );
+
+    // 키워드 검색 (페이징)
+    List<StrategyDetailDTO> selectByKeywordPaged(
+            @Param("keyword") String keyword,
+            @Param("limit") int limit,
+            @Param("offset") int offset
+    );
 }
