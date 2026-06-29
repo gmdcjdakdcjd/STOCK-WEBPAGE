@@ -48,4 +48,9 @@ public class KodexEtfSummaryServiceImpl implements KodexEtfSummaryService {
         return new ArrayList<>(result.values());
     }
 
+    @Override
+    public List<KodexEtfSummaryDTO> searchPureEtf(String keyword) {
+        // ETF명 / ETF코드 명칭으로만 검색 (구성 주식 매칭 제외)
+        return summaryMapper.selectByEtfNameOrEtfId(keyword);
+    }
 }

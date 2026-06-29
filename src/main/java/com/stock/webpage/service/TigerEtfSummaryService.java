@@ -8,4 +8,6 @@ public interface TigerEtfSummaryService {
     List<TigerEtfSummaryDTO> getAllSummaryList();
 
     List<TigerEtfSummaryDTO> search(String keyword);
+
+    List<TigerEtfSummaryDTO> searchPureEtf(String keyword);
 }

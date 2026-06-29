@@ -48,4 +48,9 @@ public class TigerEtfSummaryServiceImpl implements TigerEtfSummaryService {
         return new ArrayList<>(result.values());
     }
 
+    @Override
+    public List<TigerEtfSummaryDTO> searchPureEtf(String keyword) {
+        // ETF명 / ETF코드 명칭으로만 검색 (구성 주식 매칭 제외)
+        return summaryMapper.selectByEtfNameOrEtfId(keyword);
+    }
 }

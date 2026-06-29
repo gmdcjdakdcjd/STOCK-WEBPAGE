@@ -23,10 +23,14 @@ public class KodexEtfApiController {
     // KODEX ETF 요약 (React)
     @GetMapping("/summary")
     public List<KodexEtfSummaryDTO> summary(
-            @RequestParam(required = false) String q
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false, defaultValue = "false") boolean etfOnly
     ) {
-        return (q == null || q.isBlank())
-                ? kodexEtfSummaryService.getAllSummaryList()
+        if (q == null || q.isBlank()) {
+            return kodexEtfSummaryService.getAllSummaryList();
+        }
+        return etfOnly
+                ? kodexEtfSummaryService.searchPureEtf(q)
                 : kodexEtfSummaryService.search(q);
     }
 

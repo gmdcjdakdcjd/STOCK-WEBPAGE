@@ -8,4 +8,6 @@ public interface KodexEtfSummaryService {
     List<KodexEtfSummaryDTO> getAllSummaryList();
 
     List<KodexEtfSummaryDTO> search(String keyword);
+
+    List<KodexEtfSummaryDTO> searchPureEtf(String keyword);
 }

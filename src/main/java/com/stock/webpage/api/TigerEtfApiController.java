@@ -23,10 +23,14 @@ public class TigerEtfApiController {
     // Tiger ETF 요약 (React)
     @GetMapping("/summary")
     public List<TigerEtfSummaryDTO> summary(
-            @RequestParam(required = false) String q
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false, defaultValue = "false") boolean etfOnly
     ) {
-        return (q == null || q.isBlank())
-                ? tigerEtfSummaryService.getAllSummaryList()
+        if (q == null || q.isBlank()) {
+            return tigerEtfSummaryService.getAllSummaryList();
+        }
+        return etfOnly
+                ? tigerEtfSummaryService.searchPureEtf(q)
                 : tigerEtfSummaryService.search(q);
     }
 

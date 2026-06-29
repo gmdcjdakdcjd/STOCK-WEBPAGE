@@ -60,7 +60,8 @@ public class ApiSecurityConfig {
                                 "/api/stockIndex",
                                 "/api/crypto",
                                 "/api/marketCap",
-                                "/api/market-trend/**"
+                                "/api/market-trend/**",
+                                "/api/screener/**"
                         ).permitAll()
 
                         // 로그인 필요 (개인화 데이터)
