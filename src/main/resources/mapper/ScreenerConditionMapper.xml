@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stock.webpage.mapper.ScreenerConditionMapper">
+
+    <!-- 1-1. 부모 조건식 마스터 레코드 추가 -->
+    <insert id="insertMaster" parameterType="com.stock.webpage.dto.ScreenerConditionDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_condition (
+            userid,
+            name,
+            market,
+            created_at
+        ) VALUES (
+            #{userid},
+            #{name},
+            #{market},
+            NOW()
+        )
+    </insert>
+
+    <!-- 1-2. 자식 테이블: 세부 지표 조건 리스트 벌크 인서트 -->
+    <insert id="insertFilters">
+        INSERT INTO user_condition_filter (
+            condition_id,
+            filter_key
+        ) VALUES 
+        <foreach collection="filters" item="filterKey" separator=",">
+            (#{conditionId}, #{filterKey})
+        </foreach>
+    </insert>
+
+    <!-- 1-3. 자식 테이블: 선택된 ETF 필터 목록 벌크 인서트 -->
+    <insert id="insertEtfs">
+        INSERT INTO user_condition_etf (
+            condition_id,
+            etf_id,
+            etf_name
+        ) VALUES 
+        <foreach collection="etfs" item="etf" separator=",">
+            (#{conditionId}, #{etf.etfId}, #{etf.etfName})
+        </foreach>
+    </insert>
+
+    <!-- 2-1. 특정 사용자의 조건식 마스터 목록 조회 -->
+    <select id="selectMasterListByUserId" resultType="com.stock.webpage.dto.ScreenerConditionDTO">
+        SELECT
+            id,
+            userid,
+            name,
+            market,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+        FROM user_condition
+        WHERE userid = #{userid}
+        ORDER BY id DESC
+    </select>
+
+    <!-- 2-2. 특정 조건식에 속한 세부 지표 키 조회 -->
+    <select id="selectFiltersByConditionId" resultType="string">
+        SELECT filter_key
+        FROM user_condition_filter
+        WHERE condition_id = #{conditionId}
+    </select>
+
+    <!-- 2-3. 특정 조건식에 속한 ETF 목록 조회 -->
+    <select id="selectEtfsByConditionId" resultType="map">
+        SELECT 
+            etf_id AS etfId,
+            etf_name AS etfName
+        FROM user_condition_etf
+        WHERE condition_id = #{conditionId}
+    </select>
+
+    <!-- 3. 조건식 마스터 상세 단일 레코드 조회 -->
+    <select id="selectMasterById" resultType="com.stock.webpage.dto.ScreenerConditionDTO">
+        SELECT
+            id,
+            userid,
+            name,
+            market,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+        FROM user_condition
+        WHERE id = #{id}
+    </select>
+
+    <!-- 4. 조건식 마스터 레코드 정보 수정 -->
+    <update id="updateMaster" parameterType="com.stock.webpage.dto.ScreenerConditionDTO">
+        UPDATE user_condition
+        SET 
+            name = #{name},
+            market = #{market}
+        WHERE id = #{id} AND userid = #{userid}
+    </update>
+
+    <!-- 5. 조건식 관련 지표 일괄 삭제 -->
+    <delete id="deleteFiltersByConditionId">
+        DELETE FROM user_condition_filter
+        WHERE condition_id = #{conditionId}
+    </delete>
+
+    <!-- 6. 조건식 관련 ETF 목록 일괄 삭제 -->
+    <delete id="deleteEtfsByConditionId">
+        DELETE FROM user_condition_etf
+        WHERE condition_id = #{conditionId}
+    </delete>
+
+    <!-- 7. 조건식 마스터 레코드 삭제 (자식은 CASCADE에 의해 지워짐) -->
+    <delete id="deleteMaster">
+        DELETE FROM user_condition
+        WHERE id = #{id} AND userid = #{userid}
+    </delete>
+
+</mapper>

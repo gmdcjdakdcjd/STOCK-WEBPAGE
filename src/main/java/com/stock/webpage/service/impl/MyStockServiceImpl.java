@@ -95,7 +95,8 @@ public class MyStockServiceImpl implements MyStockService {
         for (MyStockDTO s : list) {
             StockDTO stock = stockViewService.getStockInfo(null, s.getCode());
             if (stock != null && stock.getPriceList() != null && !stock.getPriceList().isEmpty()) {
-                s.setCurrentPrice(Math.floor(stock.getPriceList().get(0).getClose()));
+                // Use rounding to two decimal places for KR current price
+            s.setCurrentPrice(roundToTwo(stock.getPriceList().get(0).getClose()));
             }
         }
 
@@ -121,9 +122,8 @@ public class MyStockServiceImpl implements MyStockService {
         for (MyStockDTO s : list) {
             StockDTO stock = stockViewService.getStockInfo(null, s.getCode());
             if (stock != null && stock.getPriceList() != null && !stock.getPriceList().isEmpty()) {
-                s.setCurrentPrice(
-                        Math.floor(stock.getPriceList().get(0).getClose() * 100) / 100.0
-                );
+                // Use rounding to two decimal places for US current price
+                s.setCurrentPrice(roundToTwo(stock.getPriceList().get(0).getClose()));
             }
         }
 
@@ -135,10 +135,18 @@ public class MyStockServiceImpl implements MyStockService {
     }
 
 
+    // Helper to round a double to two decimal places (same as frontend roundToTwo)
+    private Double roundToTwo(Double v) {
+        return v == null ? null : Math.round(v * 100) / 100.0;
+    }
+
+    // Deprecated floor helpers (kept for compatibility, but not used)
+    @Deprecated
     private Double floor(Double v) {
         return v == null ? null : Math.floor(v);
     }
 
+    @Deprecated
     private Double floor2(Double v) {
         return v == null ? null : Math.floor(v * 100) / 100.0;
     }
