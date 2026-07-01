@@ -65,4 +65,14 @@ public interface ScreenerConditionMapper {
      * 4. 조건식을 영구 삭제합니다 (ON DELETE CASCADE로 자식 테이블도 함께 지워집니다)
      */
     void deleteMaster(@Param("id") Long id, @Param("userid") String userid);
+
+    /**
+     * 특정 사용자의 삭제된(비활성) 조건식 마스터 목록을 조회합니다 (user_condition.use_yn = 'N')
+     */
+    List<ScreenerConditionDTO> selectDeletedMasterListByUserId(@Param("userid") String userid);
+
+    /**
+     * 삭제된 조건식을 다시 복구(활성화)합니다 (user_condition.use_yn = 'Y')
+     */
+    int restoreMaster(@Param("id") Long id, @Param("userid") String userid);
 }

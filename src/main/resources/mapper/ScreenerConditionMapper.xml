@@ -48,9 +48,11 @@
             userid,
             name,
             market,
-            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updatedAt,
+            use_yn AS useYn
         FROM user_condition
-        WHERE userid = #{userid}
+        WHERE userid = #{userid} AND use_yn = 'Y'
         ORDER BY id DESC
     </select>
 
@@ -77,9 +79,11 @@
             userid,
             name,
             market,
-            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updatedAt,
+            use_yn AS useYn
         FROM user_condition
-        WHERE id = #{id}
+        WHERE id = #{id} AND use_yn = 'Y'
     </select>
 
     <!-- 4. 조건식 마스터 레코드 정보 수정 -->
@@ -87,7 +91,8 @@
         UPDATE user_condition
         SET 
             name = #{name},
-            market = #{market}
+            market = #{market},
+            updated_at = NOW()
         WHERE id = #{id} AND userid = #{userid}
     </update>
 
@@ -103,10 +108,37 @@
         WHERE condition_id = #{conditionId}
     </delete>
 
-    <!-- 7. 조건식 마스터 레코드 삭제 (자식은 CASCADE에 의해 지워짐) -->
-    <delete id="deleteMaster">
-        DELETE FROM user_condition
+    <!-- 7. 조건식 마스터 레코드 논리 삭제 (Soft Delete 처리) -->
+    <update id="deleteMaster">
+        UPDATE user_condition
+        SET 
+            use_yn = 'N',
+            updated_at = NOW()
         WHERE id = #{id} AND userid = #{userid}
-    </delete>
+    </update>
+
+    <!-- 8. 특정 사용자의 삭제된 조건식 마스터 목록 조회 -->
+    <select id="selectDeletedMasterListByUserId" resultType="com.stock.webpage.dto.ScreenerConditionDTO">
+        SELECT
+            id,
+            userid,
+            name,
+            market,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updatedAt,
+            use_yn AS useYn
+        FROM user_condition
+        WHERE userid = #{userid} AND use_yn = 'N'
+        ORDER BY updated_at DESC
+    </select>
+
+    <!-- 9. 삭제된 조건식 복구 -->
+    <update id="restoreMaster">
+        UPDATE user_condition
+        SET 
+            use_yn = 'Y',
+            updated_at = NOW()
+        WHERE id = #{id} AND userid = #{userid}
+    </update>
 
 </mapper>

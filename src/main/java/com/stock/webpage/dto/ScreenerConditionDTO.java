@@ -24,4 +24,6 @@ public class ScreenerConditionDTO {
     private List<Map<String, String>> selectedEtfs;
 
     private String createdAt;     // 생성 일시
+    private String updatedAt;     // 수정 일시
+    private String useYn;         // 사용 여부 (Y/N)
 }

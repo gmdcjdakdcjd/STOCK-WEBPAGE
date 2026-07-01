@@ -92,4 +92,45 @@ public class MyConditionApiController {
             return ResponseEntity.status(500).body("조건식 삭제 오류: " + e.getMessage());
         }
     }
+
+    /**
+     * 현재 로그인한 사용자가 삭제해 둔(비활성 상태인) 모든 조건식 목록을 조회합니다.
+     */
+    @GetMapping("/deleted-list")
+    public ResponseEntity<?> getDeletedUserConditions(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(401).body("로그인 인증 세션 정보가 없습니다.");
+        }
+
+        try {
+            List<ScreenerConditionDTO> list = screenerConditionService.getDeletedConditionList(user.getUsername());
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            log.error("삭제된 조건식 목록 조회 중 오류가 발생했습니다.", e);
+            return ResponseEntity.status(500).body("삭제된 조건식 조회 오류: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 삭제된 특정 조건식을 복구(활성화) 처리합니다.
+     */
+    @PostMapping("/restore/{id}")
+    public ResponseEntity<?> restoreUserCondition(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+
+        if (user == null) {
+            return ResponseEntity.status(401).body("로그인 인증 세션 정보가 없습니다.");
+        }
+
+        try {
+            screenerConditionService.restoreCondition(id, user.getUsername());
+            return ResponseEntity.ok(Map.of("result", "SUCCESS", "message", "조건식이 성공적으로 복구되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("조건식 복구 중 오류가 발생했습니다.", e);
+            return ResponseEntity.status(500).body("조건식 복구 오류: " + e.getMessage());
+        }
+    }
 }

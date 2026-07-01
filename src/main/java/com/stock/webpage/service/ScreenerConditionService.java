@@ -26,4 +26,18 @@ public interface ScreenerConditionService {
      * @param userid 로그인한 회원 식별자 (본인 소유 여부 검증용)
      */
     void deleteCondition(Long id, String userid);
+
+    /**
+     * 특정 사용자가 삭제한(비활성 상태인) 조건식 리스트를 조회합니다.
+     * @param userid 로그인한 회원 식별자
+     * @return 구조화된 조건식 DTO 리스트
+     */
+    List<ScreenerConditionDTO> getDeletedConditionList(String userid);
+
+    /**
+     * 삭제된 조건식을 다시 복구(활성화)합니다.
+     * @param id 조건식 ID
+     * @param userid 로그인한 회원 식별자 (본인 소유 여부 검증용)
+     */
+    void restoreCondition(Long id, String userid);
 }

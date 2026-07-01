@@ -121,4 +121,42 @@ public class ScreenerConditionServiceImpl implements ScreenerConditionService {
         screenerConditionMapper.deleteMaster(id, userid);
         log.info("조건식 마스터 및 매핑 데이터가 성공적으로 영구 삭제되었습니다. ID: {}", id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ScreenerConditionDTO> getDeletedConditionList(String userid) {
+        log.info("사용자의 삭제된 조건식 목록 조회를 시작합니다. userid: {}", userid);
+        
+        // 1. 삭제된 조건식 마스터 목록을 조회합니다.
+        List<ScreenerConditionDTO> masterList = screenerConditionMapper.selectDeletedMasterListByUserId(userid);
+
+        // 2. 각 삭제된 마스터 조건식에 대해 상세 필터 지표와 ETF 매핑 정보를 조회하여 조립합니다.
+        for (ScreenerConditionDTO dto : masterList) {
+            Long conditionId = dto.getId();
+
+            // 2-1. 지표 조건 리스트 로드
+            List<String> filters = screenerConditionMapper.selectFiltersByConditionId(conditionId);
+            dto.setFilters(filters != null ? filters : new ArrayList<>());
+
+            // 2-2. ETF 필터 리스트 로드
+            List<Map<String, String>> etfs = screenerConditionMapper.selectEtfsByConditionId(conditionId);
+            dto.setSelectedEtfs(etfs != null ? etfs : new ArrayList<>());
+        }
+
+        return masterList;
+    }
+
+    @Override
+    @Transactional
+    public void restoreCondition(Long id, String userid) {
+        log.info("조건식 복구 요청을 처리합니다. 대상 ID: {}, 요청자 userid: {}", id, userid);
+        
+        // 복구 업데이트를 실행하고, 영향받은 행의 수가 0이면 해당 조건식이 존재하지 않거나 소유권이 없는 경우입니다.
+        int affectedRows = screenerConditionMapper.restoreMaster(id, userid);
+        if (affectedRows == 0) {
+            throw new IllegalArgumentException("존재하지 않거나 본인이 저장한 조건식이 아니므로 복구할 수 없습니다.");
+        }
+        
+        log.info("조건식 복구 처리가 완료되었습니다. ID: {}", id);
+    }
 }
