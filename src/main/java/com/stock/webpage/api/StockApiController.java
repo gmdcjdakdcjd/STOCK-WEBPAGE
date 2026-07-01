@@ -69,7 +69,7 @@ public class StockApiController {
         StockDTO stockInfo =
                 stockService.getStockInfo(stockName, stockCode);
 
-        log.info("stockInfo 결과: {}", stockInfo);
+        log.info("stockInfo 조회가 완료되었습니다.");
 
         if (stockInfo == null) {
             result.put("error", "해당 종목 정보를 찾을 수 없습니다.");
