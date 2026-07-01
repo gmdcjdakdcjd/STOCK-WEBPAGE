@@ -68,7 +68,10 @@ public class ApiSecurityConfig {
                         .requestMatchers(
                                 "/api/mystock/**",
                                 "/api/myetf/**",
-                                "/api/manage/**"
+                                "/api/manage/**",
+                                // /api/screener/** 는 nginx에서 FastAPI로 라우팅되므로,
+                                // 조건식 CRUD는 /api/mycondition/** 경로로 분리하여 Spring Boot에서 처리합니다.
+                                "/api/mycondition/**"
                         ).authenticated()
 
                         // 그 외
