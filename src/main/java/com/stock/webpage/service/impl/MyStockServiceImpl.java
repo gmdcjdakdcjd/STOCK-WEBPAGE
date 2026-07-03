@@ -241,4 +241,18 @@ public class MyStockServiceImpl implements MyStockService {
                 .build();
     }
 
+    @Override
+    public void updateTargets(Long id, String userId, MyStockDTO targetsDto) {
+        MyStockDTO stock = myStockMapper.selectById(id);
+        if (stock == null) {
+            throw new IllegalArgumentException("ID not found");
+        }
+        if (!stock.getUserId().equals(userId)) {
+            throw new SecurityException("본인 소유만 수정 가능");
+        }
+
+        targetsDto.setId(id);
+        targetsDto.setUserId(userId);
+        myStockMapper.updateTargets(targetsDto);
+    }
 }

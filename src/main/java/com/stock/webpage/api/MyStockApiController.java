@@ -124,4 +124,17 @@ public class MyStockApiController {
                 user.getUsername(), pageRequestDTO
         );
     }
+
+    /**
+     * 관심종목 목표가 정보 수정
+     */
+    @PostMapping("/update-targets/{id}")
+    public Map<String, Object> updateTargets(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user,
+            @RequestBody MyStockDTO targetsDto) {
+
+        myStockService.updateTargets(id, user.getUsername(), targetsDto);
+        return Map.of("result", "SUCCESS");
+    }
 }

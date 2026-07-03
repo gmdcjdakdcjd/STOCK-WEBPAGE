@@ -22,6 +22,13 @@ public class MyStockDTO {
     private Double targetPrice10;
     private String memo;
 
+    private Double buyTargetPrice1;
+    private Double buyTargetPrice2;
+    private Double buyTargetPrice3;
+    private Double sellTargetPrice1;
+    private Double sellTargetPrice2;
+    private Double sellTargetPrice3;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String deletedYn;

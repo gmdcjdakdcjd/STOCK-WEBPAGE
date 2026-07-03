@@ -51,5 +51,7 @@ public interface MyStockMapper {
     );
 
     int countDeletedList(@Param("userId") String userId);
+
+    int updateTargets(MyStockDTO dto);
 }
 

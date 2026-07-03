@@ -27,6 +27,14 @@ public enum StrategyCode {
     DUAL_MOMENTUM_3M_KR("DUAL_MOMENTUM_3M_KR","듀얼모멘텀 60일 기준","KR"),
     DUAL_MOMENTUM_6M_KR("DUAL_MOMENTUM_6M_KR","듀얼모멘텀 180일 기준","KR"),
     DUAL_MOMENTUM_1Y_KR("DUAL_MOMENTUM_1Y_KR","듀얼모멘텀 365일 기준","KR"),
+    RSI_30_UNHEATED_WEEKLY_KR("RSI_30_UNHEATED_WEEKLY_KR", "주봉 RSI 비과열(30 이하)", "KR"),
+    RSI_70_OVERHEATED_WEEKLY_KR("RSI_70_OVERHEATED_WEEKLY_KR", "주봉 RSI 과열(70 이상)", "KR"),
+    DAILY_TOUCH_MA20_KR("DAILY_TOUCH_MA20_KR", "일봉 20일선 터치", "KR"),
+    DAILY_TOUCH_MA120_KR("DAILY_TOUCH_MA120_KR", "일봉 120일선 터치", "KR"),
+    WEEKLY_TOUCH_MA20_KR("WEEKLY_TOUCH_MA20_KR", "주봉 20주선 터치", "KR"),
+    WEEKLY_TOUCH_MA120_KR("WEEKLY_TOUCH_MA120_KR", "주봉 120주선 터치", "KR"),
+    WEEKLY_BB_LOWER_TOUCH_KR("WEEKLY_BB_LOWER_TOUCH_KR", "주봉 볼밴 하단 터치", "KR"),
+    WEEKLY_BB_UPPER_TOUCH_KR("WEEKLY_BB_UPPER_TOUCH_KR", "주봉 볼밴 상단 터치", "KR"),
 
     // ============================
     // US 전략
@@ -47,7 +55,15 @@ public enum StrategyCode {
     DUAL_MOMENTUM_1M_US("DUAL_MOMENTUM_1M_US","듀얼모멘텀 30일 기준","US"),
     DUAL_MOMENTUM_3M_US("DUAL_MOMENTUM_3M_US","듀얼모멘텀 60일 기준","US"),
     DUAL_MOMENTUM_6M_US("DUAL_MOMENTUM_6M_US","듀얼모멘텀 180일 기준","US"),
-    DUAL_MOMENTUM_1Y_US("DUAL_MOMENTUM_1Y_US","듀얼모멘텀 365일 기준","US");
+    DUAL_MOMENTUM_1Y_US("DUAL_MOMENTUM_1Y_US","듀얼모멘텀 365일 기준","US"),
+    RSI_30_UNHEATED_WEEKLY_US("RSI_30_UNHEATED_WEEKLY_US", "주봉 RSI 비과열(30 이하)", "US"),
+    RSI_70_OVERHEATED_WEEKLY_US("RSI_70_OVERHEATED_WEEKLY_US", "주봉 RSI 과열(70 이상)", "US"),
+    DAILY_TOUCH_MA20_US("DAILY_TOUCH_MA20_US", "일봉 20일선 터치", "US"),
+    DAILY_TOUCH_MA120_US("DAILY_TOUCH_MA120_US", "일봉 120일선 터치", "US"),
+    WEEKLY_TOUCH_MA20_US("WEEKLY_TOUCH_MA20_US", "주봉 20주선 터치", "US"),
+    WEEKLY_TOUCH_MA120_US("WEEKLY_TOUCH_MA120_US", "주봉 120주선 터치", "US"),
+    WEEKLY_BB_LOWER_TOUCH_US("WEEKLY_BB_LOWER_TOUCH_US", "주봉 볼밴 하단 터치", "US"),
+    WEEKLY_BB_UPPER_TOUCH_US("WEEKLY_BB_UPPER_TOUCH_US", "주봉 볼밴 상단 터치", "US");
 
     private final String code;   // DB 저장용
     private final String label;  // 화면 표시용 한국어

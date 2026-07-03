@@ -30,4 +30,6 @@ public interface MyStockService {
     PageResponseDTO<MyStockDTO> getDeletedListPaging(
             String userId, PageRequestDTO dto
     );
+
+    void updateTargets(Long id, String userId, MyStockDTO targetsDto);
 }

@@ -83,6 +83,12 @@
             target_price_5,
             target_price_10,
             memo,
+            buy_target_price_1,
+            buy_target_price_2,
+            buy_target_price_3,
+            sell_target_price_1,
+            sell_target_price_2,
+            sell_target_price_3,
             deleted_yn
         ) VALUES (
                      #{userId},
@@ -94,6 +100,12 @@
                      #{targetPrice5},
                      #{targetPrice10},
                      #{memo},
+                     #{buyTargetPrice1},
+                     #{buyTargetPrice2},
+                     #{buyTargetPrice3},
+                     #{sellTargetPrice1},
+                     #{sellTargetPrice2},
+                     #{sellTargetPrice3},
                      'N'
                  )
     </insert>
@@ -147,5 +159,17 @@
           AND deleted_yn = 'Y'
     </select>
 
+    <update id="updateTargets">
+        UPDATE my_stock
+        SET buy_target_price_1 = #{buyTargetPrice1},
+            buy_target_price_2 = #{buyTargetPrice2},
+            buy_target_price_3 = #{buyTargetPrice3},
+            sell_target_price_1 = #{sellTargetPrice1},
+            sell_target_price_2 = #{sellTargetPrice2},
+            sell_target_price_3 = #{sellTargetPrice3},
+            updated_at = NOW()
+        WHERE id = #{id}
+          AND user_id = #{userId}
+    </update>
 
 </mapper>
