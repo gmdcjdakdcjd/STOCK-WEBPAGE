@@ -53,7 +53,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         List<SimpleGrantedAuthority> authorities =
                 memberService.getRolesByMid(member.getMid())
                         .stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
                         .toList();
 
         /* =========================
@@ -66,6 +66,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                         member.getEmail(),
                         member.isDel(),
                         member.isSocial(),
+                        member.getGrade(),    // 회원의 등급 정보 추가
                         authorities
                 );
 

@@ -16,7 +16,8 @@
             mpw,
             email,
             del,
-            social
+            social,
+            grade
         FROM member
         WHERE mid = #{mid}
     </select>
@@ -28,7 +29,8 @@
             mpw,
             email,
             del,
-            social
+            social,
+            grade
         FROM member
         WHERE email = #{email}
     </select>
@@ -42,7 +44,8 @@
             mpw,
             email,
             del,
-            social
+            social,
+            grade
         FROM member
         WHERE mid = #{keyword}
            OR email = #{keyword}
@@ -57,13 +60,15 @@
             mpw,
             email,
             del,
-            social
+            social,
+            grade
         ) VALUES (
                      #{mid},
                      #{mpw},
                      #{email},
                      #{del},
-                     #{social}
+                     #{social},
+                     #{grade}
                  )
     </insert>
 
@@ -99,5 +104,43 @@
         DELETE FROM member_role_set
         WHERE member_mid = #{mid}
     </delete>
+
+    <!-- =========================
+         관리자 전용 기능 (회원 관리)
+         ========================= -->
+
+    <!-- 전체 회원 조회 -->
+    <select id="selectAllMembers" resultType="MemberDto">
+        SELECT
+            mid,
+            mpw,
+            email,
+            del,
+            social,
+            grade
+        FROM member
+        ORDER BY mid ASC
+    </select>
+
+    <!-- 회원 등급 수정 -->
+    <update id="updateMemberGrade">
+        UPDATE member
+        SET grade = #{grade}
+        WHERE mid = #{mid}
+    </update>
+
+    <!-- 회원 탈퇴 (del 상태 변경) -->
+    <update id="updateDelStatus">
+        UPDATE member
+        SET del = 1
+        WHERE mid = #{mid}
+    </update>
+
+    <!-- 이메일 정보 변경 -->
+    <update id="updateEmail">
+        UPDATE member
+        SET email = #{email}
+        WHERE mid = #{mid}
+    </update>
 
 </mapper>

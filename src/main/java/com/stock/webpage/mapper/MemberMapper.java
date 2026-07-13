@@ -40,4 +40,21 @@ public interface MemberMapper {
     );
 
     int deleteRolesByMid(@Param("mid") String mid);
+
+    /* =========================
+       관리자 전용 기능 (회원 관리)
+       ========================= */
+    List<MemberDTO> selectAllMembers();
+
+    int updateMemberGrade(
+            @Param("mid") String mid,
+            @Param("grade") String grade
+    );
+
+    int updateDelStatus(@Param("mid") String mid);
+
+    int updateEmail(
+            @Param("mid") String mid,
+            @Param("email") String email
+    );
 }

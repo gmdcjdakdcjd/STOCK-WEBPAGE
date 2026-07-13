@@ -41,6 +41,16 @@ public class ApiSecurityConfig {
 
                 // API 접근 권한
                 .authorizeHttpRequests(auth -> auth
+                        // 인증이 필요한 회원 관련 API
+                        .requestMatchers(
+                                "/api/auth/change-password",
+                                "/api/auth/verify-password",
+                                "/api/auth/change-email",
+                                "/api/auth/membership",
+                                "/api/auth/membership/cancel",
+                                "/api/auth/withdraw"
+                        ).authenticated()
+
                         // 인증 없이 접근 가능 (공개 조회)
                         .requestMatchers(
                                 "/api/auth/**",
@@ -64,11 +74,15 @@ public class ApiSecurityConfig {
                                 "/api/screener/**"
                         ).permitAll()
 
+                        // 관리자 전용 권한 필요
+                        .requestMatchers(
+                                "/api/admin/**"
+                        ).hasRole("ADMIN")
+
                         // 로그인 필요 (개인화 데이터)
                         .requestMatchers(
                                 "/api/mystock/**",
                                 "/api/myetf/**",
-                                "/api/manage/**",
                                 // /api/screener/** 는 nginx에서 FastAPI로 라우팅되므로,
                                 // 조건식 CRUD는 /api/mycondition/** 경로로 분리하여 Spring Boot에서 처리합니다.
                                 "/api/mycondition/**"

@@ -27,6 +27,7 @@ public class PageRequestDTO {
     private String link;
 
     private String execDate;   // 배치 실행 날짜 (YYYYMMDD)
+    private String jobName;    // 단일 배치 Job명 필터 추가
 
 
     // =========================

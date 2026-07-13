@@ -18,13 +18,23 @@ public class BatchHistoryServiceImpl implements BatchHistoryService {
     // 날짜 목록 조회
     @Override
     public List<BatchDateGroupDTO> getHistoryDates(int offset, int size) {
-        return batchHistoryMapper.selectHistoryDateList(offset, size);
+        return batchHistoryMapper.selectHistoryDateList(offset, size, null);
+    }
+
+    @Override
+    public List<BatchDateGroupDTO> getHistoryDates(int offset, int size, String jobName) {
+        return batchHistoryMapper.selectHistoryDateList(offset, size, jobName);
     }
 
     // 날짜 목록 총 개수
     @Override
     public int getHistoryDateTotalCount() {
-        return batchHistoryMapper.selectHistoryDateTotalCount();
+        return batchHistoryMapper.selectHistoryDateTotalCount(null);
+    }
+
+    @Override
+    public int getHistoryDateTotalCount(String jobName) {
+        return batchHistoryMapper.selectHistoryDateTotalCount(jobName);
     }
 
     // 특정 날짜 상세 조회

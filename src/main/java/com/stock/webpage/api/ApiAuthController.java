@@ -146,4 +146,207 @@ public class ApiAuthController {
     public boolean checkEmail(@RequestParam String email) {
         return memberService.isEmailAvailable(email);
     }
+
+    /*
+     * =========================
+     * 비밀번호 변경 API (변경 완료 시 세션 즉시 만료 및 로그아웃)
+     * =========================
+     */
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @AuthenticationPrincipal MemberSecurityDTO user,
+            @RequestBody Map<String, String> param,
+            HttpServletRequest request
+    ) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("result", "FAIL", "reason", "UNAUTHORIZED"));
+        }
+
+        String currentPw = param.get("currentPw");
+        String newPw = param.get("newPw");
+
+        try {
+            memberService.modifyPassword(user.getMid(), currentPw, newPw);
+
+            // 비밀번호 변경 완료 즉시 세션을 무효화하여 모든 기기의 강제 로그아웃을 유도합니다.
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            SecurityContextHolder.clearContext();
+
+            return ResponseEntity.ok(Map.of("result", "OK"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "result", "FAIL",
+                    "reason", "PASSWORD_MISMATCH",
+                    "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "result", "FAIL",
+                    "message", e.getMessage()));
+        }
+    }
+
+    /*
+     * =========================
+     * 현재 비밀번호 사전 검증 API
+     * =========================
+     */
+    @PostMapping("/verify-password")
+    public ResponseEntity<?> verifyPassword(
+            @AuthenticationPrincipal MemberSecurityDTO user,
+            @RequestBody Map<String, String> param
+    ) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("result", "FAIL", "reason", "UNAUTHORIZED"));
+        }
+
+        String password = param.get("password");
+
+        try {
+            boolean isMatch = memberService.verifyPassword(user.getMid(), password);
+            if (isMatch) {
+                return ResponseEntity.ok(Map.of("result", "OK"));
+            } else {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "result", "FAIL",
+                        "reason", "PASSWORD_MISMATCH",
+                        "message", "현재 비밀번호가 올바르지 않습니다."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "result", "FAIL",
+                    "message", e.getMessage()));
+        }
+    }
+
+    /*
+     * =========================
+     * 멤버십 가입 API (PREMIUM 등급 승격)
+     * =========================
+     */
+    @PostMapping("/membership")
+    public ResponseEntity<?> joinMembership(
+            @AuthenticationPrincipal MemberSecurityDTO user
+    ) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("result", "FAIL", "reason", "UNAUTHORIZED"));
+        }
+
+        try {
+            memberService.joinMembership(user.getMid());
+
+            // 로그인 상태 확인 API에서 최신 등급을 반환할 수 있도록 세션 유저 객체 정보도 함께 갱신해줍니다.
+            user.setGrade(com.stock.webpage.enums.MemberGrade.PREMIUM.name());
+
+            return ResponseEntity.ok(Map.of("result", "OK"));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "result", "FAIL",
+                    "message", e.getMessage()));
+        }
+    }
+
+    /*
+     * =========================
+     * 회원 탈퇴 API (del=1 상태 변경 및 로그아웃)
+     * =========================
+     */
+    @PostMapping("/withdraw")
+    public ResponseEntity<?> withdraw(
+            @AuthenticationPrincipal MemberSecurityDTO user,
+            @RequestBody Map<String, String> param,
+            HttpServletRequest request
+    ) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("result", "FAIL", "reason", "UNAUTHORIZED"));
+        }
+
+        String password = param.get("password");
+
+        try {
+            memberService.withdraw(user.getMid(), password);
+
+            // 회원 탈퇴 성공 시 스프링 시큐리티 컨텍스트 및 세션을 파괴하여 완전히 로그아웃 처리합니다.
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            SecurityContextHolder.clearContext();
+
+            return ResponseEntity.ok(Map.of("result", "OK"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "result", "FAIL",
+                    "reason", "PASSWORD_MISMATCH",
+                    "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "result", "FAIL",
+                    "message", e.getMessage()));
+        }
+    }
+
+    /*
+     * =========================
+     * 멤버십 해지 API (BASIC 등급 강등)
+     * =========================
+     */
+    @PostMapping("/membership/cancel")
+    public ResponseEntity<?> cancelMembership(
+            @AuthenticationPrincipal MemberSecurityDTO user
+    ) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("result", "FAIL", "reason", "UNAUTHORIZED"));
+        }
+
+        try {
+            memberService.cancelMembership(user.getMid());
+
+            // 세션 유저의 등급 정보도 BASIC으로 즉시 갱신
+            user.setGrade(com.stock.webpage.enums.MemberGrade.BASIC.name());
+
+            return ResponseEntity.ok(Map.of("result", "OK"));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "result", "FAIL",
+                    "message", e.getMessage()));
+        }
+    }
+
+    /*
+     * =========================
+     * 이메일 주소 변경 API
+     * =========================
+     */
+    @PostMapping("/change-email")
+    public ResponseEntity<?> changeEmail(
+            @AuthenticationPrincipal MemberSecurityDTO user,
+            @RequestBody Map<String, String> param
+    ) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("result", "FAIL", "reason", "UNAUTHORIZED"));
+        }
+
+        String email = param.get("email");
+
+        try {
+            memberService.modifyEmail(user.getMid(), email);
+
+            // 로그인 정보 상태 확인 시 반영되도록 세션 내의 정보도 즉시 갱신합니다.
+            user.setEmail(email);
+
+            return ResponseEntity.ok(Map.of("result", "OK"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "result", "FAIL",
+                    "reason", "DUPLICATE_EMAIL",
+                    "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "result", "FAIL",
+                    "message", e.getMessage()));
+        }
+    }
 }
