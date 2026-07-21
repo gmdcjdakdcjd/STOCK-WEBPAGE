@@ -12,12 +12,15 @@
     <!-- MID 조회 -->
     <select id="selectMemberByMid" resultType="MemberDto">
         SELECT
+            mno,
             mid,
             mpw,
             email,
             del,
             social,
-            grade
+            grade,
+            DATE_FORMAT(regdate, '%Y-%m-%d') AS regDate,
+            DATE_FORMAT(deldate, '%Y-%m-%d %H:%i') AS delDate
         FROM member
         WHERE mid = #{mid}
     </select>
@@ -25,12 +28,15 @@
     <!-- EMAIL 조회 -->
     <select id="selectMemberByEmail" resultType="MemberDto">
         SELECT
+            mno,
             mid,
             mpw,
             email,
             del,
             social,
-            grade
+            grade,
+            DATE_FORMAT(regdate, '%Y-%m-%d') AS regDate,
+            DATE_FORMAT(deldate, '%Y-%m-%d %H:%i') AS delDate
         FROM member
         WHERE email = #{email}
     </select>
@@ -40,12 +46,15 @@
             parameterType="string"
             resultType="MemberDto">
         SELECT
+            mno,
             mid,
             mpw,
             email,
             del,
             social,
-            grade
+            grade,
+            DATE_FORMAT(regdate, '%Y-%m-%d') AS regDate,
+            DATE_FORMAT(deldate, '%Y-%m-%d %H:%i') AS delDate
         FROM member
         WHERE mid = #{keyword}
            OR email = #{keyword}
@@ -71,6 +80,33 @@
                      #{grade}
                  )
     </insert>
+
+    <!-- 탈퇴 회원 재가입 (UPDATE) -->
+    <update id="rejoinMember">
+        UPDATE member
+        SET mpw = #{mpw},
+            email = #{email},
+            del = 0,
+            social = #{social},
+            grade = #{grade},
+            regdate = NOW(),
+            deldate = NULL
+        WHERE mid = #{mid}
+    </update>
+
+    <!-- 동일 mid 탈퇴 회원의 mid 아카이빙 (신규 INSERT 유니크 충돌 방지 및 이력 보존) -->
+    <update id="archiveDeletedMember">
+        UPDATE member
+        SET mid = CONCAT(mid, '_del_', UNIX_TIMESTAMP())
+        WHERE mid = #{mid} AND del = 1
+    </update>
+
+    <!-- 동일 email 탈퇴 회원의 email 아카이빙 (신규 INSERT 유니크 충돌 방지 및 이력 보존) -->
+    <update id="archiveDeletedMemberByEmail">
+        UPDATE member
+        SET email = CONCAT(email, '_del_', UNIX_TIMESTAMP())
+        WHERE email = #{email} AND del = 1
+    </update>
 
     <!-- =========================
          password update
@@ -112,14 +148,17 @@
     <!-- 전체 회원 조회 -->
     <select id="selectAllMembers" resultType="MemberDto">
         SELECT
+            mno,
             mid,
             mpw,
             email,
             del,
             social,
-            grade
+            grade,
+            DATE_FORMAT(regdate, '%Y-%m-%d') AS regDate,
+            DATE_FORMAT(deldate, '%Y-%m-%d %H:%i') AS delDate
         FROM member
-        ORDER BY mid ASC
+        ORDER BY mno DESC
     </select>
 
     <!-- 회원 등급 수정 -->
@@ -129,10 +168,13 @@
         WHERE mid = #{mid}
     </update>
 
-    <!-- 회원 탈퇴 (del 상태 변경) -->
+    <!-- 회원 탈퇴 (del 상태 변경, 탈퇴 일시 기록 및 mid/email 유니크 해제 아카이빙) -->
     <update id="updateDelStatus">
         UPDATE member
-        SET del = 1
+        SET del = 1,
+            deldate = NOW(),
+            mid = CONCAT(mid, '_del_', UNIX_TIMESTAMP()),
+            email = IF(email IS NOT NULL AND email != '', CONCAT(email, '_del_', UNIX_TIMESTAMP()), email)
         WHERE mid = #{mid}
     </update>
 

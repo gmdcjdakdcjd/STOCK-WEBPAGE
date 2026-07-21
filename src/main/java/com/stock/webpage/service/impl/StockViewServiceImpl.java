@@ -99,6 +99,10 @@ public class StockViewServiceImpl implements StockViewService {
         // =========================
         // 미국 주식
         // =========================
+        if (us == null) {
+            return null;
+        }
+
         List<PriceDTO> prices =
                 dailyPriceUsMapper.selectByCodeOrderByDateDesc(us.getCode())
                         .stream()

@@ -140,13 +140,15 @@ public class MyStockServiceImpl implements MyStockService {
         return v == null ? null : Math.round(v * 100) / 100.0;
     }
 
-    // Deprecated floor helpers (kept for compatibility, but not used)
+    // 더 이상 사용되지 않는 헬퍼 메서드입니다. (미사용 경고 억제 및 호환성 보존)
     @Deprecated
+    @SuppressWarnings("unused")
     private Double floor(Double v) {
         return v == null ? null : Math.floor(v);
     }
 
     @Deprecated
+    @SuppressWarnings("unused")
     private Double floor2(Double v) {
         return v == null ? null : Math.floor(v * 100) / 100.0;
     }

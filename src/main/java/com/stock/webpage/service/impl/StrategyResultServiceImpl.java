@@ -57,7 +57,7 @@ public class StrategyResultServiceImpl implements StrategyResultService {
         List<String> strategies =
                 Arrays.stream(StrategyCode.values())
                         .filter(s -> s.getMarket().equals(market))
-                        .map(StrategyCode::getCode)
+                        .map(s -> s.getCode())
                         .toList();
 
         // 전략명 정규화 (빈 문자열 → null)

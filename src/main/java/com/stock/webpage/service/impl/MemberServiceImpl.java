@@ -57,8 +57,7 @@ public class MemberServiceImpl implements MemberService {
 
         // 기본 권한 부여
         memberMapper.insertRole(dto.getMid(), "USER");
-
-        log.info("회원가입 완료: {}", dto.getMid());
+        log.info("신규 회원가입 완료: {}", dto.getMid());
     }
 
     /* =========================
