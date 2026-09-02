@@ -165,7 +165,14 @@ public class ApiStrategyController {
         return usStrategy != null ? usStrategy.getCaptureName() : "포착값";
     }
 
-    private double truncate2(double value) {
+    /*
+     * 전달받은 Double 값이 null인 경우 null을 안전하게 반환하고,
+     * 값이 존재하는 경우 소수점 둘째 자리까지 절사합니다.
+     */
+    private Double truncate2(Double value) {
+        if (value == null) {
+            return null;
+        }
         return Math.floor(value * 100) / 100.0;
     }
 }
