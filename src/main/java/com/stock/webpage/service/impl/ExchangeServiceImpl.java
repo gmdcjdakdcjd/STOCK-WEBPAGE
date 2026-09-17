@@ -2,7 +2,6 @@ package com.stock.webpage.service.impl;
 
 import com.stock.webpage.dto.MarketIndicatorDTO;
 import com.stock.webpage.mapper.ExchangeMapper;
-import com.stock.webpage.mapper.MarketIndicatorMapper;
 import com.stock.webpage.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

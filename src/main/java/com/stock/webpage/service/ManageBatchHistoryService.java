@@ -23,7 +23,6 @@ public class ManageBatchHistoryService {
     // 날짜 목록 조회
     public PageResponseDTO<BatchDateGroupDTO> getHistoryDates(PageRequestDTO pageRequestDTO) {
 
-        int page = pageRequestDTO.getPage();
         int size = pageRequestDTO.getSize();
         int offset = pageRequestDTO.getOffset();
         String jobName = pageRequestDTO.getJobName();
@@ -82,7 +81,8 @@ public class ManageBatchHistoryService {
     @Transactional
     public void triggerBatchJob(String type, Long jobId) {
         if ("IN".equalsIgnoreCase(type)) {
-            // 1. BatchIn은 큐를 타지 않으므로, 현재 시각으로부터 2분 뒤로 스케줄 예약 시간을 설정하여 act_gb='N' 상태로 구동을 유도합니다.
+            // 1. BatchIn은 큐를 타지 않으므로, 현재 시각으로부터 2분 뒤로 스케줄 예약 시간을 설정하여 act_gb='N' 상태로 구동을
+            // 유도합니다.
             java.time.LocalTime targetTime = java.time.LocalTime.now().plusMinutes(2);
             String targetHour = String.format("%02d", targetTime.getHour());
             String targetMin = String.format("%02d", targetTime.getMinute());
@@ -116,24 +116,22 @@ public class ManageBatchHistoryService {
     public void updateBatchJobSchedule(String type, Long jobId, BatchJobDTO scheduleDTO) {
         if ("IN".equalsIgnoreCase(type)) {
             batchHistoryMapper.updateBatchInSchedule(
-                jobId,
-                scheduleDTO.getScheduleGb(),
-                scheduleDTO.getJobHour(),
-                scheduleDTO.getJobMin(),
-                scheduleDTO.getJobWeek(),
-                scheduleDTO.getJobDay(),
-                scheduleDTO.getJobMonth()
-            );
+                    jobId,
+                    scheduleDTO.getScheduleGb(),
+                    scheduleDTO.getJobHour(),
+                    scheduleDTO.getJobMin(),
+                    scheduleDTO.getJobWeek(),
+                    scheduleDTO.getJobDay(),
+                    scheduleDTO.getJobMonth());
         } else if ("OUT".equalsIgnoreCase(type)) {
             batchHistoryMapper.updateBatchOutSchedule(
-                jobId,
-                scheduleDTO.getScheduleGb(),
-                scheduleDTO.getJobHour(),
-                scheduleDTO.getJobMin(),
-                scheduleDTO.getJobWeek(),
-                scheduleDTO.getJobDay(),
-                scheduleDTO.getJobMonth()
-            );
+                    jobId,
+                    scheduleDTO.getScheduleGb(),
+                    scheduleDTO.getJobHour(),
+                    scheduleDTO.getJobMin(),
+                    scheduleDTO.getJobWeek(),
+                    scheduleDTO.getJobDay(),
+                    scheduleDTO.getJobMonth());
         } else {
             throw new IllegalArgumentException("올바르지 않은 배치 유형 구분자입니다.");
         }
